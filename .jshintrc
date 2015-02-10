@@ -1,8 +1,0 @@
-{
-  "asi": true,
-  "boss": true,
-  "laxbreak": true,
-  "unused": true,
-  "undef": true,
-  "node": true
-}
