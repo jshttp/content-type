@@ -117,12 +117,12 @@ describe('contentType.parse(req)', function () {
   })
 
   it('should reject objects without headers property', function () {
-    assert.throws(contentType.parse.bind(null, {}), /argument string is required/)
+    assert.throws(contentType.parse.bind(null, {}), /content-type header is missing/)
   })
 
   it('should reject missing content-type', function () {
     var req = {headers: {}}
-    assert.throws(contentType.parse.bind(null, req), /argument string is required/)
+    assert.throws(contentType.parse.bind(null, req), /content-type header is missing/)
   })
 })
 
@@ -134,11 +134,11 @@ describe('contentType.parse(res)', function () {
   })
 
   it('should reject objects without getHeader method', function () {
-    assert.throws(contentType.parse.bind(null, {}), /argument string is required/)
+    assert.throws(contentType.parse.bind(null, {}), /content-type header is missing/)
   })
 
   it('should reject missing content-type', function () {
     var res = {getHeader: function(){}}
-    assert.throws(contentType.parse.bind(null, res), /argument string is required/)
+    assert.throws(contentType.parse.bind(null, res), /content-type header is missing/)
   })
 })
