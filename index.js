@@ -109,6 +109,10 @@ function parse(string) {
   // support req/res-like objects as argument
   if (typeof string === 'object') {
     string = getcontenttype(string)
+
+    if (typeof string !== 'string') {
+      throw new TypeError('content-type header missing from object');
+    }
   }
 
   if (typeof string !== 'string') {

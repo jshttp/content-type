@@ -6,7 +6,7 @@
 [![Build Status][travis-image]][travis-url]
 [![Test Coverage][coveralls-image]][coveralls-url]
 
-Create and parse HTTP Content-Type header according to RFC 7231
+Create and parse HTTP Content-Type header according to RFC 7231.
 
 ## Installation
 
@@ -35,6 +35,8 @@ properties (examples are shown for the string `'image/svg+xml; charset=utf-8'`):
  - `parameters`: An object of the parameters in the media type (name of parameter
    always lower case). Example: `{charset: 'utf-8'}`
 
+Throws a type error if the string is missing or invalid.
+
 ### contentType.parse(req)
 
 ```js
@@ -42,7 +44,8 @@ var obj = contentType.parse(req)
 ```
 
 Parse the `content-type` header from the given `req`. Short-cut for
-`contentType.parse(req.headers['content-type'])`.
+`contentType.parse(req.headers['content-type'])`. Throws a type error if the
+header is missing or invalid.
 
 ### contentType.parse(res)
 
@@ -51,7 +54,8 @@ var obj = contentType.parse(res)
 ```
 
 Parse the `content-type` header set on the given `res`. Short-cut for
-`contentType.parse(res.getHeader('content-type'))`.
+`contentType.parse(res.getHeader('content-type'))`. Throws a type error if the
+header is missing or invalid.
 
 ### contentType.format(obj)
 
@@ -67,6 +71,8 @@ shown that produce the string `'image/svg+xml; charset=utf-8'`):
 
  - `parameters`: An object of the parameters in the media type (name of the
    parameter will be lower-cased). Example: `{charset: 'utf-8'}`
+
+Throws a type error if the object is invalid.
 
 ## License
 
