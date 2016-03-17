@@ -51,8 +51,15 @@ var typeRegExp = /^[!#$%&'\*\+\-\.\^_`\|~0-9A-Za-z]+\/[!#$%&'\*\+\-\.\^_`\|~0-9A
  * @public
  */
 
-exports.format = format
-exports.parse = parse
+if(typeof exports !== 'undefined') {
+  exports.format = format
+  exports.parse = parse
+} else {
+  window.contentType = {
+    format: format,
+    parse: parse,
+  };
+}
 
 /**
  * Format object to media type.
