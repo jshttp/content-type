@@ -13,7 +13,7 @@ var invalidTypes = [
   'text/p£ain',
   'text/(plain)',
   'text/@plain',
-  'text/plain,wrong',
+  'text/plain,wrong'
 ]
 
 describe('contentType.parse(string)', function () {
@@ -128,7 +128,7 @@ describe('contentType.parse(req)', function () {
 
 describe('contentType.parse(res)', function () {
   it('should parse content-type header', function () {
-    var res = {getHeader: function(){ return 'text/html'}}
+    var res = {getHeader: function () { return 'text/html' }}
     var type = contentType.parse(res)
     assert.equal(type.type, 'text/html')
   })
@@ -138,7 +138,7 @@ describe('contentType.parse(res)', function () {
   })
 
   it('should reject missing content-type', function () {
-    var res = {getHeader: function(){}}
+    var res = {getHeader: function () {}}
     assert.throws(contentType.parse.bind(null, res), /content-type header is missing/)
   })
 })

@@ -62,7 +62,7 @@ exports.parse = parse
  * @public
  */
 
-function format(obj) {
+function format (obj) {
   if (!obj || typeof obj !== 'object') {
     throw new TypeError('argument obj is required')
   }
@@ -103,7 +103,7 @@ function format(obj) {
  * @public
  */
 
-function parse(string) {
+function parse (string) {
   if (!string) {
     throw new TypeError('argument string is required')
   }
@@ -113,7 +113,7 @@ function parse(string) {
     string = getcontenttype(string)
 
     if (typeof string !== 'string') {
-      throw new TypeError('content-type header is missing from object');
+      throw new TypeError('content-type header is missing from object')
     }
   }
 
@@ -137,7 +137,7 @@ function parse(string) {
 
   paramRegExp.lastIndex = index
 
-  while (match = paramRegExp.exec(string)) {
+  while ((match = paramRegExp.exec(string))) {
     if (match.index !== index) {
       throw new TypeError('invalid parameter format')
     }
@@ -171,7 +171,7 @@ function parse(string) {
  * @private
  */
 
-function getcontenttype(obj) {
+function getcontenttype (obj) {
   if (typeof obj.getHeader === 'function') {
     // res-like
     return obj.getHeader('content-type')
@@ -191,7 +191,7 @@ function getcontenttype(obj) {
  * @private
  */
 
-function qstring(val) {
+function qstring (val) {
   var str = String(val)
 
   // no need to quote tokens
@@ -210,7 +210,7 @@ function qstring(val) {
  * Class to represent a content type.
  * @private
  */
-function ContentType(type) {
+function ContentType (type) {
   this.parameters = Object.create(null)
   this.type = type
 }
