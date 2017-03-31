@@ -38,7 +38,7 @@ var qescRegExp = /\\([\u000b\u0020-\u00ff])/g
 var quoteRegExp = /([\\"])/g
 
 /**
- * RegExp to match type in RFC 6838
+ * RegExp to match type in RFC 7231 sec 3.1.1.1
  *
  * media-type = type "/" subtype
  * type       = token
