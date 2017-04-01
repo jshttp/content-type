@@ -20,9 +20,9 @@
  * obs-text      = %x80-FF
  * quoted-pair   = "\" ( HTAB / SP / VCHAR / obs-text )
  */
-var paramRegExp = /; *([!#$%&'\*\+\-\.\^_`\|~0-9A-Za-z]+) *= *("(?:[\u000b\u0020\u0021\u0023-\u005b\u005d-\u007e\u0080-\u00ff]|\\[\u000b\u0020-\u00ff])*"|[!#$%&'\*\+\-\.\^_`\|~0-9A-Za-z]+) */g
-var textRegExp = /^[\u000b\u0020-\u007e\u0080-\u00ff]+$/
-var tokenRegExp = /^[!#$%&'\*\+\-\.\^_`\|~0-9A-Za-z]+$/
+var PARAM_REGEXP = /; *([!#$%&'*+.^_`|~0-9A-Za-z-]+) *= *("(?:[\u000b\u0020\u0021\u0023-\u005b\u005d-\u007e\u0080-\u00ff]|\\[\u000b\u0020-\u00ff])*"|[!#$%&'*+.^_`|~0-9A-Za-z-]+) */g
+var TEXT_REGEXP = /^[\u000b\u0020-\u007e\u0080-\u00ff]+$/
+var TOKEN_REGEXP = /^[!#$%&'*+.^_`|~0-9A-Za-z-]+$/
 
 /**
  * RegExp to match quoted-pair in RFC 7230 sec 3.2.6
@@ -30,12 +30,12 @@ var tokenRegExp = /^[!#$%&'\*\+\-\.\^_`\|~0-9A-Za-z]+$/
  * quoted-pair = "\" ( HTAB / SP / VCHAR / obs-text )
  * obs-text    = %x80-FF
  */
-var qescRegExp = /\\([\u000b\u0020-\u00ff])/g
+var QESC_REGEXP = /\\([\u000b\u0020-\u00ff])/g
 
 /**
  * RegExp to match chars that must be quoted-pair in RFC 7230 sec 3.2.6
  */
-var quoteRegExp = /([\\"])/g
+var QUOTE_REGEXP = /([\\"])/g
 
 /**
  * RegExp to match type in RFC 7231 sec 3.1.1.1
@@ -44,7 +44,7 @@ var quoteRegExp = /([\\"])/g
  * type       = token
  * subtype    = token
  */
-var typeRegExp = /^[!#$%&'\*\+\-\.\^_`\|~0-9A-Za-z]+\/[!#$%&'\*\+\-\.\^_`\|~0-9A-Za-z]+$/
+var TYPE_REGEXP = /^[!#$%&'*+.^_`|~0-9A-Za-z-]+\/[!#$%&'*+.^_`|~0-9A-Za-z-]+$/
 
 /**
  * Module exports.
@@ -70,7 +70,7 @@ function format (obj) {
   var parameters = obj.parameters
   var type = obj.type
 
-  if (!type || !typeRegExp.test(type)) {
+  if (!type || !TYPE_REGEXP.test(type)) {
     throw new TypeError('invalid type')
   }
 
@@ -84,7 +84,7 @@ function format (obj) {
     for (var i = 0; i < params.length; i++) {
       param = params[i]
 
-      if (!tokenRegExp.test(param)) {
+      if (!TOKEN_REGEXP.test(param)) {
         throw new TypeError('invalid parameter name')
       }
 
@@ -126,7 +126,7 @@ function parse (string) {
     ? string.substr(0, index).trim()
     : string.trim()
 
-  if (!typeRegExp.test(type)) {
+  if (!TYPE_REGEXP.test(type)) {
     throw new TypeError('invalid media type')
   }
 
@@ -135,9 +135,9 @@ function parse (string) {
   var obj = new ContentType(type.toLowerCase())
   var value
 
-  paramRegExp.lastIndex = index
+  PARAM_REGEXP.lastIndex = index
 
-  while ((match = paramRegExp.exec(string))) {
+  while ((match = PARAM_REGEXP.exec(string))) {
     if (match.index !== index) {
       throw new TypeError('invalid parameter format')
     }
@@ -150,7 +150,7 @@ function parse (string) {
       // remove quotes and escapes
       value = value
         .substr(1, value.length - 2)
-        .replace(qescRegExp, '$1')
+        .replace(QESC_REGEXP, '$1')
     }
 
     obj.parameters[key] = value
@@ -195,15 +195,15 @@ function qstring (val) {
   var str = String(val)
 
   // no need to quote tokens
-  if (tokenRegExp.test(str)) {
+  if (TOKEN_REGEXP.test(str)) {
     return str
   }
 
-  if (str.length > 0 && !textRegExp.test(str)) {
+  if (str.length > 0 && !TEXT_REGEXP.test(str)) {
     throw new TypeError('invalid parameter value')
   }
 
-  return '"' + str.replace(quoteRegExp, '\\$1') + '"'
+  return '"' + str.replace(QUOTE_REGEXP, '\\$1') + '"'
 }
 
 /**
