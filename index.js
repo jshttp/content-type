@@ -20,7 +20,7 @@
  * obs-text      = %x80-FF
  * quoted-pair   = "\" ( HTAB / SP / VCHAR / obs-text )
  */
-var PARAM_REGEXP = /; *([!#$%&'*+.^_`|~0-9A-Za-z-]+) *= *("(?:[\u000b\u0020\u0021\u0023-\u005b\u005d-\u007e\u0080-\u00ff]|\\[\u000b\u0020-\u00ff])*"|[!#$%&'*+.^_`|~0-9A-Za-z-]+) */g
+var PARAM_REGEXP = /; *([!#$%&'*+.^_`|~0-9A-Za-z-]+) *= *("(?:[\u000b\u0020\u0021\u0023-\u005b\u005d-\u007e\u0080-\u00ff]|\\[\u000b\u0020-\u00ff])*"|[!#$%&'*+.^_`|/~0-9A-Za-z-]+) */g
 var TEXT_REGEXP = /^[\u000b\u0020-\u007e\u0080-\u00ff]+$/
 var TOKEN_REGEXP = /^[!#$%&'*+.^_`|~0-9A-Za-z-]+$/
 
