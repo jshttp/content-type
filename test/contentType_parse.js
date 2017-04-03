@@ -88,7 +88,7 @@ describe('contentType.parse(string)', function () {
     })
   })
 
-  it('should work with when parameter value contains forwardslash', function() {
+  it('should work with when parameter value contains forwardslash', function () {
     var type = contentType.parse('multipart/form-data; boundary=UUKn-QYhlhZR4UhMuBO/6SvI.FBLAreiv1ZS9i6v_1u3d5dF8_e_i_HlvL_dZCGD_zBKp')
     assert.equal(type.type, 'multipart/form-data')
     assert.equal(type.parameters.boundary, 'UUKn-QYhlhZR4UhMuBO/6SvI.FBLAreiv1ZS9i6v_1u3d5dF8_e_i_HlvL_dZCGD_zBKp')
