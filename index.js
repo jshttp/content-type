@@ -108,23 +108,19 @@ function parse (string) {
     throw new TypeError('argument string is required')
   }
 
-  if (typeof string === 'object') {
-    // support req/res-like objects as argument
-    string = getcontenttype(string)
+  // support req/res-like objects as argument
+  var header = typeof string === 'object'
+    ? getcontenttype(string)
+    : string
 
-    if (typeof string !== 'string') {
-      throw new TypeError('content-type header is missing from object')
-    }
-  }
-
-  if (typeof string !== 'string') {
+  if (typeof header !== 'string') {
     throw new TypeError('argument string is required to be a string')
   }
 
-  var index = string.indexOf(';')
+  var index = header.indexOf(';')
   var type = index !== -1
-    ? string.substr(0, index).trim()
-    : string.trim()
+    ? header.substr(0, index).trim()
+    : header.trim()
 
   if (!TYPE_REGEXP.test(type)) {
     throw new TypeError('invalid media type')
@@ -137,7 +133,7 @@ function parse (string) {
 
   PARAM_REGEXP.lastIndex = index
 
-  while ((match = PARAM_REGEXP.exec(string))) {
+  while ((match = PARAM_REGEXP.exec(header))) {
     if (match.index !== index) {
       throw new TypeError('invalid parameter format')
     }
@@ -156,7 +152,7 @@ function parse (string) {
     obj.parameters[key] = value
   }
 
-  if (index !== -1 && index !== string.length) {
+  if (index !== -1 && index !== header.length) {
     throw new TypeError('invalid parameter format')
   }
 
@@ -172,15 +168,21 @@ function parse (string) {
  */
 
 function getcontenttype (obj) {
+  var header
+
   if (typeof obj.getHeader === 'function') {
     // res-like
-    return obj.getHeader('content-type')
+    header = obj.getHeader('content-type')
+  } else if (typeof obj.headers === 'object') {
+    // req-like
+    header = obj.headers && obj.headers['content-type']
   }
 
-  if (typeof obj.headers === 'object') {
-    // req-like
-    return obj.headers && obj.headers['content-type']
+  if (typeof header !== 'string') {
+    throw new TypeError('content-type header is missing from object')
   }
+
+  return header
 }
 
 /**
