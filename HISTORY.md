@@ -1,5 +1,5 @@
-unreleased
-==========
+1.0.4 / 2017-09-11
+==================
 
   * perf: skip parameter parsing when no parameters
 
