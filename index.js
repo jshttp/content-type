@@ -126,34 +126,38 @@ function parse (string) {
     throw new TypeError('invalid media type')
   }
 
-  var key
-  var match
   var obj = new ContentType(type.toLowerCase())
-  var value
 
-  PARAM_REGEXP.lastIndex = index
+  // parse parameters
+  if (index !== -1) {
+    var key
+    var match
+    var value
 
-  while ((match = PARAM_REGEXP.exec(header))) {
-    if (match.index !== index) {
+    PARAM_REGEXP.lastIndex = index
+
+    while ((match = PARAM_REGEXP.exec(header))) {
+      if (match.index !== index) {
+        throw new TypeError('invalid parameter format')
+      }
+
+      index += match[0].length
+      key = match[1].toLowerCase()
+      value = match[2]
+
+      if (value[0] === '"') {
+        // remove quotes and escapes
+        value = value
+          .substr(1, value.length - 2)
+          .replace(QESC_REGEXP, '$1')
+      }
+
+      obj.parameters[key] = value
+    }
+
+    if (index !== header.length) {
       throw new TypeError('invalid parameter format')
     }
-
-    index += match[0].length
-    key = match[1].toLowerCase()
-    value = match[2]
-
-    if (value[0] === '"') {
-      // remove quotes and escapes
-      value = value
-        .substr(1, value.length - 2)
-        .replace(QESC_REGEXP, '$1')
-    }
-
-    obj.parameters[key] = value
-  }
-
-  if (index !== -1 && index !== header.length) {
-    throw new TypeError('invalid parameter format')
   }
 
   return obj
