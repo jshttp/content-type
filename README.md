@@ -26,8 +26,8 @@ var contentType = require('content-type')
 var obj = contentType.parse('image/svg+xml; charset=utf-8')
 ```
 
-Parse a content type string. This will return an object with the following
-properties (examples are shown for the string `'image/svg+xml; charset=utf-8'`):
+Parse a `Content-Type` string. This will return an object with the following properties
+(example above is shown for the string `'image/svg+xml; charset=utf-8'`):
 
  - `type`: The media type (the type and subtype, always lower case).
    Example: `'image/svg+xml'`
@@ -43,7 +43,7 @@ Throws a `TypeError` if the string is missing or invalid.
 var obj = contentType.parse(req)
 ```
 
-Parse the `content-type` header from the given `req`. Short-cut for
+Parse the `Content-Type` header from the given `req`. Short-cut for
 `contentType.parse(req.headers['content-type'])`.
 
 Throws a `TypeError` if the `Content-Type` header is missing or invalid.
@@ -54,7 +54,7 @@ Throws a `TypeError` if the `Content-Type` header is missing or invalid.
 var obj = contentType.parse(res)
 ```
 
-Parse the `content-type` header set on the given `res`. Short-cut for
+Parse the `Content-Type` header set on the given `res`. Short-cut for
 `contentType.parse(res.getHeader('content-type'))`.
 
 Throws a `TypeError` if the `Content-Type` header is missing or invalid.
@@ -62,12 +62,15 @@ Throws a `TypeError` if the `Content-Type` header is missing or invalid.
 ### contentType.format(obj)
 
 ```js
-var str = contentType.format({type: 'image/svg+xml'})
+var str = contentType.format({
+  type: 'image/svg+xml',
+  parameters: {charset: 'utf-8'}
+})
 ```
 
-Format an object into a content type string. This will return a string of the
-content type for the given object with the following properties (examples are
-shown that produce the string `'image/svg+xml; charset=utf-8'`):
+Format an object into a `Content-Type` string. This will return a string of the
+content type for the given object with the following properties (example above
+are shown for the string `'image/svg+xml; charset=utf-8'`):
 
  - `type`: The media type (will be lower-cased). Example: `'image/svg+xml'`
 
