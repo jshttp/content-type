@@ -1,10 +1,10 @@
 # content-type
 
-[![NPM Version][npm-image]][npm-url]
-[![NPM Downloads][downloads-image]][downloads-url]
-[![Node.js Version][node-version-image]][node-version-url]
+[![NPM Version][npm-version-image]][npm-url]
+[![NPM Downloads][npm-downloads-image]][npm-url]
+[![Node.js Version][node-image]][node-url]
 [![Build Status][travis-image]][travis-url]
-[![Test Coverage][coveralls-image]][coveralls-url]
+[![Coverage Status][coveralls-image]][coveralls-url]
 
 Create and parse HTTP Content-Type header according to RFC 7231
 
@@ -83,13 +83,12 @@ Throws a `TypeError` if the object contains an invalid type or parameter names.
 
 [MIT](LICENSE)
 
-[npm-image]: https://img.shields.io/npm/v/content-type.svg
+[coveralls-image]: https://badgen.net/coveralls/c/github/jshttp/content-type/master
+[coveralls-url]: https://coveralls.io/r/jshttp/content-type?branch=master
+[node-image]: https://badgen.net/npm/node/content-type
+[node-url]: https://nodejs.org/en/download
+[npm-downloads-image]: https://badgen.net/npm/dm/content-type
 [npm-url]: https://npmjs.org/package/content-type
-[node-version-image]: https://img.shields.io/node/v/content-type.svg
-[node-version-url]: http://nodejs.org/download/
-[travis-image]: https://img.shields.io/travis/jshttp/content-type/master.svg
+[npm-version-image]: https://badgen.net/npm/v/content-type
+[travis-image]: https://badgen.net/travis/jshttp/content-type/master
 [travis-url]: https://travis-ci.org/jshttp/content-type
-[coveralls-image]: https://img.shields.io/coveralls/jshttp/content-type/master.svg
-[coveralls-url]: https://coveralls.io/r/jshttp/content-type
-[downloads-image]: https://img.shields.io/npm/dm/content-type.svg
-[downloads-url]: https://npmjs.org/package/content-type
