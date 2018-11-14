@@ -5,12 +5,12 @@ var contentType = require('..')
 describe('contentType.format(obj)', function () {
   it('should format basic type', function () {
     var str = contentType.format({type: 'text/html'})
-    assert.equal(str, 'text/html')
+    assert.strictEqual(str, 'text/html')
   })
 
   it('should format type with suffix', function () {
     var str = contentType.format({type: 'image/svg+xml'})
-    assert.equal(str, 'image/svg+xml')
+    assert.strictEqual(str, 'image/svg+xml')
   })
 
   it('should format type with parameter', function () {
@@ -18,7 +18,7 @@ describe('contentType.format(obj)', function () {
       type: 'text/html',
       parameters: {charset: 'utf-8'}
     })
-    assert.equal(str, 'text/html; charset=utf-8')
+    assert.strictEqual(str, 'text/html; charset=utf-8')
   })
 
   it('should format type with parameter that needs quotes', function () {
@@ -26,7 +26,7 @@ describe('contentType.format(obj)', function () {
       type: 'text/html',
       parameters: {foo: 'bar or "baz"'}
     })
-    assert.equal(str, 'text/html; foo="bar or \\"baz\\""')
+    assert.strictEqual(str, 'text/html; foo="bar or \\"baz\\""')
   })
 
   it('should format type with parameter with empty value', function () {
@@ -34,7 +34,7 @@ describe('contentType.format(obj)', function () {
       type: 'text/html',
       parameters: {foo: ''}
     })
-    assert.equal(str, 'text/html; foo=""')
+    assert.strictEqual(str, 'text/html; foo=""')
   })
 
   it('should format type with multiple parameters', function () {
@@ -42,7 +42,7 @@ describe('contentType.format(obj)', function () {
       type: 'text/html',
       parameters: {charset: 'utf-8', foo: 'bar', bar: 'baz'}
     })
-    assert.equal(str, 'text/html; bar=baz; charset=utf-8; foo=bar')
+    assert.strictEqual(str, 'text/html; bar=baz; charset=utf-8; foo=bar')
   })
 
   it('should require argument', function () {
