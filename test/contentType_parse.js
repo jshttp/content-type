@@ -112,7 +112,7 @@ describe('contentType.parse(string)', function () {
 
 describe('contentType.parse(req)', function () {
   it('should parse content-type header', function () {
-    var req = {headers: {'content-type': 'text/html'}}
+    var req = { headers: { 'content-type': 'text/html' } }
     var type = contentType.parse(req)
     assert.strictEqual(type.type, 'text/html')
   })
@@ -122,14 +122,14 @@ describe('contentType.parse(req)', function () {
   })
 
   it('should reject missing content-type', function () {
-    var req = {headers: {}}
+    var req = { headers: {} }
     assert.throws(contentType.parse.bind(null, req), /content-type header is missing/)
   })
 })
 
 describe('contentType.parse(res)', function () {
   it('should parse content-type header', function () {
-    var res = {getHeader: function () { return 'text/html' }}
+    var res = { getHeader: function () { return 'text/html' } }
     var type = contentType.parse(res)
     assert.strictEqual(type.type, 'text/html')
   })
@@ -139,7 +139,7 @@ describe('contentType.parse(res)', function () {
   })
 
   it('should reject missing content-type', function () {
-    var res = {getHeader: function () {}}
+    var res = { getHeader: function () {} }
     assert.throws(contentType.parse.bind(null, res), /content-type header is missing/)
   })
 })
