@@ -88,7 +88,7 @@ function format (obj) {
         throw new TypeError('invalid parameter name')
       }
 
-      string += '; ' + param + '=' + qstring(parameters[param])
+      string += ';' + param + '=' + qstring(parameters[param])
     }
   }
 
