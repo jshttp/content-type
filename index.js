@@ -119,7 +119,7 @@ function parse (string) {
 
   var index = header.indexOf(';')
   var type = index !== -1
-    ? header.substr(0, index).trim()
+    ? header.slice(0, index).trim()
     : header.trim()
 
   if (!TYPE_REGEXP.test(type)) {
@@ -148,7 +148,7 @@ function parse (string) {
       if (value[0] === '"') {
         // remove quotes and escapes
         value = value
-          .substr(1, value.length - 2)
+          .slice(1, -1)
           .replace(QESC_REGEXP, '$1')
       }
 
