@@ -3,7 +3,7 @@
 [![NPM Version][npm-version-image]][npm-url]
 [![NPM Downloads][npm-downloads-image]][npm-url]
 [![Node.js Version][node-image]][node-url]
-[![Build Status][travis-image]][travis-url]
+[![Build Status][ci-image]][ci-url]
 [![Coverage Status][coveralls-image]][coveralls-url]
 
 Create and parse HTTP Content-Type header according to RFC 7231
@@ -83,6 +83,8 @@ Throws a `TypeError` if the object contains an invalid type or parameter names.
 
 [MIT](LICENSE)
 
+[ci-image]: https://badgen.net/github/checks/jshttp/content-type/master?label=ci
+[ci-url]: https://github.com/jshttp/content-type/actions/workflows/ci.yml
 [coveralls-image]: https://badgen.net/coveralls/c/github/jshttp/content-type/master
 [coveralls-url]: https://coveralls.io/r/jshttp/content-type?branch=master
 [node-image]: https://badgen.net/npm/node/content-type
@@ -90,5 +92,3 @@ Throws a `TypeError` if the object contains an invalid type or parameter names.
 [npm-downloads-image]: https://badgen.net/npm/dm/content-type
 [npm-url]: https://npmjs.org/package/content-type
 [npm-version-image]: https://badgen.net/npm/v/content-type
-[travis-image]: https://badgen.net/travis/jshttp/content-type/master
-[travis-url]: https://travis-ci.org/jshttp/content-type
