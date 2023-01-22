@@ -74,7 +74,7 @@ describe('contentType.format(obj)', function () {
   })
 
   it('should reject invalid parameter value', function () {
-    var obj = { type: 'image/svg', parameters: { 'foo': 'bar\u0000' } }
+    var obj = { type: 'image/svg', parameters: { foo: 'bar\u0000' } }
     assert.throws(contentType.format.bind(null, obj), /invalid parameter value/)
   })
 })
