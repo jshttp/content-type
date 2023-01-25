@@ -14,7 +14,7 @@
   "repository": "jshttp/content-type",
   "devDependencies": {
     "deep-equal": "1.0.1",
-    "eslint": "6.8.0",
+    "eslint": "7.32.0",
     "eslint-config-standard": "14.1.0",
     "eslint-plugin-import": "2.27.5",
     "eslint-plugin-node": "11.0.0",
