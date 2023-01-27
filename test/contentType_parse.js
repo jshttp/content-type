@@ -36,19 +36,19 @@ describe('contentType.parse(string)', function () {
   it('should parse parameters', function () {
     var type = contentType.parse('text/html; charset=utf-8; foo=bar')
     assert.strictEqual(type.type, 'text/html')
-    deepEqual(type.parameters, {
+    assert.ok(deepEqual(type.parameters, {
       charset: 'utf-8',
       foo: 'bar'
-    })
+    }))
   })
 
   it('should parse parameters with extra LWS', function () {
     var type = contentType.parse('text/html ; charset=utf-8 ; foo=bar')
     assert.strictEqual(type.type, 'text/html')
-    deepEqual(type.parameters, {
+    assert.ok(deepEqual(type.parameters, {
       charset: 'utf-8',
       foo: 'bar'
-    })
+    }))
   })
 
   it('should lower-case type', function () {
@@ -59,34 +59,34 @@ describe('contentType.parse(string)', function () {
   it('should lower-case parameter names', function () {
     var type = contentType.parse('text/html; Charset=UTF-8')
     assert.strictEqual(type.type, 'text/html')
-    deepEqual(type.parameters, {
+    assert.ok(deepEqual(type.parameters, {
       charset: 'UTF-8'
-    })
+    }))
   })
 
   it('should unquote parameter values', function () {
     var type = contentType.parse('text/html; charset="UTF-8"')
     assert.strictEqual(type.type, 'text/html')
-    deepEqual(type.parameters, {
+    assert.ok(deepEqual(type.parameters, {
       charset: 'UTF-8'
-    })
+    }))
   })
 
   it('should unquote parameter values with escapes', function () {
     var type = contentType.parse('text/html; charset = "UT\\F-\\\\\\"8\\""')
     assert.strictEqual(type.type, 'text/html')
-    deepEqual(type.parameters, {
+    assert.ok(deepEqual(type.parameters, {
       charset: 'UTF-\\"8"'
-    })
+    }))
   })
 
   it('should handle balanced quotes', function () {
     var type = contentType.parse('text/html; param="charset=\\"utf-8\\"; foo=bar"; bar=foo')
     assert.strictEqual(type.type, 'text/html')
-    deepEqual(type.parameters, {
+    assert.ok(deepEqual(type.parameters, {
       param: 'charset="utf-8"; foo=bar',
       bar: 'foo'
-    })
+    }))
   })
 
   invalidTypes.forEach(function (type) {
