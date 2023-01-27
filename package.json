@@ -14,11 +14,11 @@
   "repository": "jshttp/content-type",
   "devDependencies": {
     "deep-equal": "1.0.1",
-    "eslint": "7.32.0",
+    "eslint": "8.32.0",
     "eslint-config-standard": "15.0.1",
     "eslint-plugin-import": "2.27.5",
     "eslint-plugin-node": "11.1.0",
-    "eslint-plugin-promise": "5.2.0",
+    "eslint-plugin-promise": "6.1.1",
     "eslint-plugin-standard": "4.1.0",
     "mocha": "9.2.2",
     "nyc": "15.1.0"
