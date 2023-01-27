@@ -1,3 +1,8 @@
+unreleased
+==========
+
+  * perf: skip value escaping when unnecessary
+
 1.0.4 / 2017-09-11
 ==================
 

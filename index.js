@@ -145,11 +145,14 @@ function parse (string) {
       key = match[1].toLowerCase()
       value = match[2]
 
-      if (value[0] === '"') {
-        // remove quotes and escapes
-        value = value
-          .slice(1, -1)
-          .replace(QESC_REGEXP, '$1')
+      if (value.charCodeAt(0) === 0x22 /* " */) {
+        // remove quotes
+        value = value.slice(1, -1)
+
+        // remove escapes
+        if (value.indexOf('\\') !== -1) {
+          value = value.replace(QESC_REGEXP, '$1')
+        }
       }
 
       obj.parameters[key] = value
