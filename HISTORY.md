@@ -1,5 +1,5 @@
-unreleased
-==========
+1.0.5 / 2023-01-29
+==================
 
   * perf: skip value escaping when unnecessary
 
