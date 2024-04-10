@@ -74,7 +74,7 @@ jobs:
           npm-i: mocha@5.2.0 nyc@11.9.0
 
         - name: Node.js 6.x
-          node-version: "6.16"
+          node-version: "6.17"
           npm-i: mocha@6.2.3 nyc@14.1.1
 
         - name: Node.js 7.x
@@ -83,11 +83,11 @@ jobs:
 
         - name: Node.js 8.x
           node-version: "8.17"
-          npm-i: mocha@7.2.0
+          npm-i: mocha@7.2.0 nyc@14.1.1
 
         - name: Node.js 9.x
           node-version: "9.11"
-          npm-i: mocha@7.2.0
+          npm-i: mocha@7.2.0 nyc@14.1.1
 
         - name: Node.js 10.x
           node-version: "10.24"
@@ -99,30 +99,27 @@ jobs:
 
         - name: Node.js 12.x
           node-version: "12.22"
-          npm-i: mocha@9.2.2
 
         - name: Node.js 13.x
           node-version: "13.14"
-          npm-i: mocha@9.2.2
 
         - name: Node.js 14.x
-          node-version: "14.21"
+          node-version: "14.19"
 
         - name: Node.js 15.x
           node-version: "15.14"
 
         - name: Node.js 16.x
-          node-version: "16.19"
+          node-version: "16.13"
 
         - name: Node.js 17.x
-          node-version: "17.9"
+          node-version: "17.4"
 
         - name: Node.js 18.x
-          node-version: "18.13"
+          node-version: "18.20"
 
         - name: Node.js 19.x
-          node-version: "19.5"
-
+          node-version: "19.9"
     steps:
     - uses: actions/checkout@v3
 
