@@ -1,7 +1,7 @@
 
 var assert = require('assert')
 var contentType = require('..')
-var deepEqual = require('deep-equal')
+var deepEqual = require('dequal')
 
 var invalidTypes = [
   ' ',
