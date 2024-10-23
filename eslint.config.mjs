@@ -22,4 +22,12 @@ export default [
     },
     rules: js.configs.recommended.rules
   },
+  {
+    files: ['scripts/**/*.mjs'],
+    languageOptions: {
+      ecmaVersion: 2020,
+      sourceType: 'module',
+      globals: globals.nodeBuiltin
+    },
+  },
 ];

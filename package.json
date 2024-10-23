@@ -45,6 +45,6 @@
     "test": "node --test --test-reporter spec",
     "test-ci": "c8 --reporter=lcovonly --reporter=text npm test",
     "test-cov": "c8 --reporter=html --reporter=text npm test",
-    "version": "node scripts/version-history.js && git add HISTORY.md"
+    "version": "node scripts/version-history.mjs && git add HISTORY.md"
   }
 }
