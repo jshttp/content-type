@@ -1,4 +1,5 @@
 const assert = require('node:assert')
+const { describe, it } = require('node:test')
 const contentType = require('..')
 
 describe('contentType.format(obj) [commonjs]', function () {

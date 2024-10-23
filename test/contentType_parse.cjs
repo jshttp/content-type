@@ -1,6 +1,6 @@
 const assert = require('node:assert')
+const { describe, it } = require('node:test')
 const contentType = require('..')
-const deepEqual = require('deep-equal')
 
 const invalidTypes = [
   ' ',
@@ -35,19 +35,19 @@ describe('contentType.parse(string) [commonjs]', function () {
   it('should parse parameters', function () {
     const type = contentType.parse('text/html; charset=utf-8; foo=bar')
     assert.strictEqual(type.type, 'text/html')
-    assert.ok(deepEqual(type.parameters, {
+    assert.deepEqual(type.parameters, {
       charset: 'utf-8',
       foo: 'bar'
-    }))
+    })
   })
 
   it('should parse parameters with extra LWS', function () {
     const type = contentType.parse('text/html ; charset=utf-8 ; foo=bar')
     assert.strictEqual(type.type, 'text/html')
-    assert.ok(deepEqual(type.parameters, {
+    assert.deepEqual(type.parameters, {
       charset: 'utf-8',
       foo: 'bar'
-    }))
+    })
   })
 
   it('should lower-case type', function () {
@@ -58,34 +58,34 @@ describe('contentType.parse(string) [commonjs]', function () {
   it('should lower-case parameter names', function () {
     const type = contentType.parse('text/html; Charset=UTF-8')
     assert.strictEqual(type.type, 'text/html')
-    assert.ok(deepEqual(type.parameters, {
+    assert.deepEqual(type.parameters, {
       charset: 'UTF-8'
-    }))
+    })
   })
 
   it('should unquote parameter values', function () {
     const type = contentType.parse('text/html; charset="UTF-8"')
     assert.strictEqual(type.type, 'text/html')
-    assert.ok(deepEqual(type.parameters, {
+    assert.deepEqual(type.parameters, {
       charset: 'UTF-8'
-    }))
+    })
   })
 
   it('should unquote parameter values with escapes', function () {
     const type = contentType.parse('text/html; charset = "UT\\F-\\\\\\"8\\""')
     assert.strictEqual(type.type, 'text/html')
-    assert.ok(deepEqual(type.parameters, {
+    assert.deepEqual(type.parameters, {
       charset: 'UTF-\\"8"'
-    }))
+    })
   })
 
   it('should handle balanced quotes', function () {
     const type = contentType.parse('text/html; param="charset=\\"utf-8\\"; foo=bar"; bar=foo')
     assert.strictEqual(type.type, 'text/html')
-    assert.ok(deepEqual(type.parameters, {
+    assert.deepEqual(type.parameters, {
       param: 'charset="utf-8"; foo=bar',
       bar: 'foo'
-    }))
+    })
   })
 
   invalidTypes.forEach(function (type) {

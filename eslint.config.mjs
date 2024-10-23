@@ -22,10 +22,4 @@ export default [
     },
     rules: js.configs.recommended.rules
   },
-  {
-    files: ['test/**/*.{cjs,mjs}'],
-    languageOptions: {
-      globals: globals.mocha
-    }
-  },
 ];
