@@ -4,8 +4,6 @@
  * MIT Licensed
  */
 
-'use strict'
-
 /**
  * RegExp to match *( ";" parameter ) in RFC 7231 sec 3.1.1.1
  *
@@ -20,9 +18,9 @@
  * obs-text      = %x80-FF
  * quoted-pair   = "\" ( HTAB / SP / VCHAR / obs-text )
  */
-var PARAM_REGEXP = /; *([!#$%&'*+.^_`|~0-9A-Za-z-]+) *= *("(?:[\u000b\u0020\u0021\u0023-\u005b\u005d-\u007e\u0080-\u00ff]|\\[\u000b\u0020-\u00ff])*"|[!#$%&'*+.^_`|~0-9A-Za-z-]+) */g // eslint-disable-line no-control-regex
-var TEXT_REGEXP = /^[\u000b\u0020-\u007e\u0080-\u00ff]+$/ // eslint-disable-line no-control-regex
-var TOKEN_REGEXP = /^[!#$%&'*+.^_`|~0-9A-Za-z-]+$/
+const PARAM_REGEXP = /; *([!#$%&'*+.^_`|~0-9A-Za-z-]+) *= *("(?:[\u000b\u0020\u0021\u0023-\u005b\u005d-\u007e\u0080-\u00ff]|\\[\u000b\u0020-\u00ff])*"|[!#$%&'*+.^_`|~0-9A-Za-z-]+) */g // eslint-disable-line no-control-regex
+const TEXT_REGEXP = /^[\u000b\u0020-\u007e\u0080-\u00ff]+$/ // eslint-disable-line no-control-regex
+const TOKEN_REGEXP = /^[!#$%&'*+.^_`|~0-9A-Za-z-]+$/
 
 /**
  * RegExp to match quoted-pair in RFC 7230 sec 3.2.6
@@ -30,12 +28,12 @@ var TOKEN_REGEXP = /^[!#$%&'*+.^_`|~0-9A-Za-z-]+$/
  * quoted-pair = "\" ( HTAB / SP / VCHAR / obs-text )
  * obs-text    = %x80-FF
  */
-var QESC_REGEXP = /\\([\u000b\u0020-\u00ff])/g // eslint-disable-line no-control-regex
+const QESC_REGEXP = /\\([\u000b\u0020-\u00ff])/g // eslint-disable-line no-control-regex
 
 /**
  * RegExp to match chars that must be quoted-pair in RFC 7230 sec 3.2.6
  */
-var QUOTE_REGEXP = /([\\"])/g
+const QUOTE_REGEXP = /([\\"])/g
 
 /**
  * RegExp to match type in RFC 7231 sec 3.1.1.1
@@ -44,15 +42,7 @@ var QUOTE_REGEXP = /([\\"])/g
  * type       = token
  * subtype    = token
  */
-var TYPE_REGEXP = /^[!#$%&'*+.^_`|~0-9A-Za-z-]+\/[!#$%&'*+.^_`|~0-9A-Za-z-]+$/
-
-/**
- * Module exports.
- * @public
- */
-
-exports.format = format
-exports.parse = parse
+const TYPE_REGEXP = /^[!#$%&'*+.^_`|~0-9A-Za-z-]+\/[!#$%&'*+.^_`|~0-9A-Za-z-]+$/
 
 /**
  * Format object to media type.
@@ -62,24 +52,24 @@ exports.parse = parse
  * @public
  */
 
-function format (obj) {
+export function format(obj) {
   if (!obj || typeof obj !== 'object') {
     throw new TypeError('argument obj is required')
   }
 
-  var parameters = obj.parameters
-  var type = obj.type
+  const parameters = obj.parameters
+  const type = obj.type
 
   if (!type || !TYPE_REGEXP.test(type)) {
     throw new TypeError('invalid type')
   }
 
-  var string = type
+  let string = type
 
   // append parameters
   if (parameters && typeof parameters === 'object') {
-    var param
-    var params = Object.keys(parameters).sort()
+    let param
+    const params = Object.keys(parameters).sort()
 
     for (var i = 0; i < params.length; i++) {
       param = params[i]
@@ -103,13 +93,13 @@ function format (obj) {
  * @public
  */
 
-function parse (string) {
+export function parse(string) {
   if (!string) {
     throw new TypeError('argument string is required')
   }
 
   // support req/res-like objects as argument
-  var header = typeof string === 'object'
+  const header = typeof string === 'object'
     ? getcontenttype(string)
     : string
 
@@ -117,8 +107,8 @@ function parse (string) {
     throw new TypeError('argument string is required to be a string')
   }
 
-  var index = header.indexOf(';')
-  var type = index !== -1
+  let index = header.indexOf(';')
+  const type = index !== -1
     ? header.slice(0, index).trim()
     : header.trim()
 
@@ -126,13 +116,13 @@ function parse (string) {
     throw new TypeError('invalid media type')
   }
 
-  var obj = new ContentType(type.toLowerCase())
+  const obj = new ContentType(type.toLowerCase())
 
   // parse parameters
   if (index !== -1) {
-    var key
-    var match
-    var value
+    let key
+    let match
+    let value
 
     PARAM_REGEXP.lastIndex = index
 
@@ -174,8 +164,8 @@ function parse (string) {
  * @private
  */
 
-function getcontenttype (obj) {
-  var header
+function getcontenttype(obj) {
+  let header
 
   if (typeof obj.getHeader === 'function') {
     // res-like
@@ -200,8 +190,8 @@ function getcontenttype (obj) {
  * @private
  */
 
-function qstring (val) {
-  var str = String(val)
+function qstring(val) {
+  const str = String(val)
 
   // no need to quote tokens
   if (TOKEN_REGEXP.test(str)) {
@@ -219,7 +209,9 @@ function qstring (val) {
  * Class to represent a content type.
  * @private
  */
-function ContentType (type) {
-  this.parameters = Object.create(null)
-  this.type = type
+class ContentType {
+  constructor(type) {
+    this.parameters = Object.create(null)
+    this.type = type
+  }
 }

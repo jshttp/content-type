@@ -1,20 +1,19 @@
+const assert = require('node:assert')
+const contentType = require('..')
 
-var assert = require('assert')
-var contentType = require('..')
-
-describe('contentType.format(obj)', function () {
+describe('contentType.format(obj) [commonjs]', function () {
   it('should format basic type', function () {
-    var str = contentType.format({ type: 'text/html' })
+    const str = contentType.format({ type: 'text/html' })
     assert.strictEqual(str, 'text/html')
   })
 
   it('should format type with suffix', function () {
-    var str = contentType.format({ type: 'image/svg+xml' })
+    const str = contentType.format({ type: 'image/svg+xml' })
     assert.strictEqual(str, 'image/svg+xml')
   })
 
   it('should format type with parameter', function () {
-    var str = contentType.format({
+    const str = contentType.format({
       type: 'text/html',
       parameters: { charset: 'utf-8' }
     })
@@ -22,7 +21,7 @@ describe('contentType.format(obj)', function () {
   })
 
   it('should format type with parameter that needs quotes', function () {
-    var str = contentType.format({
+    const str = contentType.format({
       type: 'text/html',
       parameters: { foo: 'bar or "baz"' }
     })
@@ -30,7 +29,7 @@ describe('contentType.format(obj)', function () {
   })
 
   it('should format type with parameter with empty value', function () {
-    var str = contentType.format({
+    const str = contentType.format({
       type: 'text/html',
       parameters: { foo: '' }
     })
@@ -38,7 +37,7 @@ describe('contentType.format(obj)', function () {
   })
 
   it('should format type with multiple parameters', function () {
-    var str = contentType.format({
+    const str = contentType.format({
       type: 'text/html',
       parameters: { charset: 'utf-8', foo: 'bar', bar: 'baz' }
     })
@@ -54,27 +53,27 @@ describe('contentType.format(obj)', function () {
   })
 
   it('should require type', function () {
-    var obj = {}
+    const obj = {}
     assert.throws(contentType.format.bind(null, obj), /invalid type/)
   })
 
   it('should reject invalid type', function () {
-    var obj = { type: 'text/' }
+    const obj = { type: 'text/' }
     assert.throws(contentType.format.bind(null, obj), /invalid type/)
   })
 
   it('should reject invalid type with LWS', function () {
-    var obj = { type: ' text/html' }
+    const obj = { type: ' text/html' }
     assert.throws(contentType.format.bind(null, obj), /invalid type/)
   })
 
   it('should reject invalid parameter name', function () {
-    var obj = { type: 'image/svg', parameters: { 'foo/': 'bar' } }
+    const obj = { type: 'image/svg', parameters: { 'foo/': 'bar' } }
     assert.throws(contentType.format.bind(null, obj), /invalid parameter name/)
   })
 
   it('should reject invalid parameter value', function () {
-    var obj = { type: 'image/svg', parameters: { foo: 'bar\u0000' } }
+    const obj = { type: 'image/svg', parameters: { foo: 'bar\u0000' } }
     assert.throws(contentType.format.bind(null, obj), /invalid parameter value/)
   })
 })

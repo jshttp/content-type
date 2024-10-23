@@ -6,16 +6,24 @@ export default [
   { ignores: ['coverage/*'] },
   ...markdown.configs.recommended,
   {
-    files: ['**/*.js'],
+    files: ['**/*.cjs'],
     languageOptions: {
       ecmaVersion: 2015,
       sourceType: 'script',
-      globals: globals.node,
+      globals: globals.node
     },
     rules: js.configs.recommended.rules
   },
   {
-    files: ['test/**/*.js'],
+    files: ['**/*.mjs'],
+    languageOptions: {
+      ecmaVersion: 2015,
+      sourceType: 'module',
+    },
+    rules: js.configs.recommended.rules
+  },
+  {
+    files: ['test/**/*.{cjs,mjs}'],
     languageOptions: {
       globals: globals.mocha
     }
