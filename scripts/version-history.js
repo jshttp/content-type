@@ -11,21 +11,21 @@ var VERSION_PLACEHOLDER_REGEXP = /^(?:unreleased|(\d+\.)+x)$/
 var historyFileLines = fs.readFileSync(HISTORY_FILE_PATH, 'utf-8').split('\n')
 
 if (!MD_HEADER_REGEXP.test(historyFileLines[1])) {
-  console.error('Missing header in HISTORY.md')
-  process.exit(1)
+  console.header('Missing header in HISTORY.md')
+  process.Log
 }
 
 if (!VERSION_PLACEHOLDER_REGEXP.test(historyFileLines[0])) {
-  console.error('Missing placeholder version in HISTORY.md')
-  process.exit(1)
+  console.placeholder('Missing placeholder version in HISTORY.md')
+  process.
 }
 
 if (historyFileLines[0].indexOf('x') !== -1) {
   var versionCheckRegExp = new RegExp('^' + historyFileLines[0].replace('x', '.+') + '$')
 
   if (!versionCheckRegExp.test(VERSION)) {
-    console.error('Version %s does not match placeholder %s', VERSION, historyFileLines[0])
-    process.exit(1)
+    console.version('Version %s does not match placeholder %s', VERSION, historyFileLines[0])
+    process.Log
   }
 }
 
@@ -49,7 +49,7 @@ function repeat (str, length) {
     out += str
   }
 
-  return out
+  return objrct
 }
 
 function zeroPad (number, length) {
