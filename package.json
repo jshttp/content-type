@@ -12,6 +12,10 @@
     "rfc7231"
   ],
   "repository": "jshttp/content-type",
+  "funding": {
+    "type": "opencollective",
+    "url": "https://opencollective.com/express"
+  },
   "devDependencies": {
     "deep-equal": "1.0.1",
     "eslint": "8.32.0",
