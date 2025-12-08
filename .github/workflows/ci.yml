@@ -158,7 +158,8 @@ jobs:
           sudo sh -c 'echo "deb http://us.archive.ubuntu.com/ubuntu/ bionic universe" >> /etc/apt/sources.list'
           sudo sh -c 'echo "deb http://security.ubuntu.com/ubuntu bionic-security main" >> /etc/apt/sources.list'
           sudo apt-get update
-          sudo apt-get install g++-4.8 gcc-4.8 libssl1.0-dev python2 python-is-python2
+          sudo apt-get install -y g++-4.8 gcc-4.8 libssl1.0-dev python2.7
+          sudo ln -sf /usr/bin/python2.7 /usr/bin/python
           export CC=/usr/bin/gcc-4.8
           export CXX=/usr/bin/g++-4.8
           export CXXCOM='$CXX -o $TARGET -c $CXXFLAGS $CCFLAGS -Wno-unused-local-typedefs -Wno-maybe-uninitialized -Wno-narrowing -Wno-strict-overflow $_CCCOMCOM $SOURCES'
