@@ -154,6 +154,7 @@ jobs:
       shell: bash -eo pipefail -l {0}
       run: |
         if [[ "${{ matrix.node-version }}" == 0.6* ]]; then
+          sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 3B4FE6ACC0B21F32
           sudo sh -c 'echo "deb http://us.archive.ubuntu.com/ubuntu/ bionic universe" >> /etc/apt/sources.list'
           sudo sh -c 'echo "deb http://security.ubuntu.com/ubuntu bionic-security main" >> /etc/apt/sources.list'
           sudo apt-get update
