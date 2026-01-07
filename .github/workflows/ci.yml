@@ -43,10 +43,12 @@ jobs:
         - Node.js 25.x
 
         include:
-        - name: Node.js 0.6
-          node-version: "0.6"
-          npm-i: mocha@1.21.5
-          npm-rm: nyc
+        # Node.js 0.6 is currently disabled: it's a very old runtime and the toolchain/OS
+        # setup required to run the pipeline needs to be reviewed and maintained separately.
+        # - name: Node.js 0.6
+        #   node-version: "0.6"
+        #   npm-i: mocha@1.21.5
+        #   npm-rm: nyc
 
         - name: Node.js 0.8
           node-version: "0.8"
@@ -153,17 +155,20 @@ jobs:
     - name: Install Node.js ${{ matrix.node-version }}
       shell: bash -eo pipefail -l {0}
       run: |
-        if [[ "${{ matrix.node-version }}" == 0.6* ]]; then
-          sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 3B4FE6ACC0B21F32
-          sudo sh -c 'echo "deb http://us.archive.ubuntu.com/ubuntu/ bionic universe" >> /etc/apt/sources.list'
-          sudo sh -c 'echo "deb http://security.ubuntu.com/ubuntu bionic-security main" >> /etc/apt/sources.list'
-          sudo apt-get update
-          sudo apt-get install -y g++-4.8 gcc-4.8 libssl1.0-dev python2.7
-          sudo ln -sf /usr/bin/python2.7 /usr/bin/python
-          export CC=/usr/bin/gcc-4.8
-          export CXX=/usr/bin/g++-4.8
-          export CXXCOM='$CXX -o $TARGET -c $CXXFLAGS $CCFLAGS -Wno-unused-local-typedefs -Wno-maybe-uninitialized -Wno-narrowing -Wno-strict-overflow $_CCCOMCOM $SOURCES'
-        fi
+        # NOTE: Node.js 0.6 is currently disabled. Keeping the setup here commented out as a
+        # reference; running 0.6 requires an old toolchain/OS packages and should be revisited
+        # before re-enabling it in the matrix.
+        # if [[ "${{ matrix.node-version }}" == 0.6* ]]; then
+        #   sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 3B4FE6ACC0B21F32
+        #   sudo sh -c 'echo "deb http://us.archive.ubuntu.com/ubuntu/ bionic universe" >> /etc/apt/sources.list'
+        #   sudo sh -c 'echo "deb http://security.ubuntu.com/ubuntu bionic-security main" >> /etc/apt/sources.list'
+        #   sudo apt-get update
+        #   sudo apt-get install -y g++-4.8 gcc-4.8 libssl1.0-dev python2.7
+        #   sudo ln -sf /usr/bin/python2.7 /usr/bin/python
+        #   export CC=/usr/bin/gcc-4.8
+        #   export CXX=/usr/bin/g++-4.8
+        #   export CXXCOM='$CXX -o $TARGET -c $CXXFLAGS $CCFLAGS -Wno-unused-local-typedefs -Wno-maybe-uninitialized -Wno-narrowing -Wno-strict-overflow $_CCCOMCOM $SOURCES'
+        # fi
         nvm install --default ${{ matrix.node-version }}
         if [[ "${{ matrix.node-version }}" == 0.* && "$(cut -d. -f2 <<< "${{ matrix.node-version }}")" -lt 10 ]]; then
           nvm install --alias=npm 0.10
