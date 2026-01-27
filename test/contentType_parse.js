@@ -51,6 +51,24 @@ describe('contentType.parse(string)', function () {
     }))
   })
 
+  it('should parse parameters with HTAB LWS', function () {
+    var type = contentType.parse('text/html;\tcharset=utf-8;\tfoo=bar')
+    assert.strictEqual(type.type, 'text/html')
+    assert.ok(deepEqual(type.parameters, {
+      charset: 'utf-8',
+      foo: 'bar'
+    }))
+  })
+
+  it('should parse parameters with mixed LWS', function () {
+    var type = contentType.parse('text/html ;\t charset=utf-8 ; \tfoo=bar')
+    assert.strictEqual(type.type, 'text/html')
+    assert.ok(deepEqual(type.parameters, {
+      charset: 'utf-8',
+      foo: 'bar'
+    }))
+  })
+
   it('should lower-case type', function () {
     var type = contentType.parse('IMAGE/SVG+XML')
     assert.strictEqual(type.type, 'image/svg+xml')
