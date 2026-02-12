@@ -86,7 +86,7 @@ Throws a `TypeError` if the object contains an invalid type or parameter names.
 [ci-image]: https://badgen.net/github/checks/jshttp/content-type/master?label=ci
 [ci-url]: https://github.com/jshttp/content-type/actions/workflows/ci.yml
 [coveralls-image]: https://badgen.net/codecov/c/github/jshttp/content-type/master
-[coveralls-url]: https://coveralls.io/r/jshttp/content-type?branch=master
+[coveralls-url]: https://codecov.io/gh/jshttp/content-type
 [node-image]: https://badgen.net/npm/node/content-type
 [node-url]: https://nodejs.org/en/download
 [npm-downloads-image]: https://badgen.net/npm/dm/content-type
