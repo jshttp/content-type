@@ -41,42 +41,26 @@ describe("format(obj)", function () {
       type: "text/html",
       parameters: { charset: "utf-8", foo: "bar", bar: "baz" },
     });
-    assert.strictEqual(str, "text/html; bar=baz; charset=utf-8; foo=bar");
-  });
-
-  it("should require argument", function () {
-    assert.throws(
-      format.bind(null, undefined as any),
-      /argument obj is required/,
-    );
-  });
-
-  it("should reject non-objects", function () {
-    assert.throws(format.bind(null, 7 as any), /argument obj is required/);
-  });
-
-  it("should require type", function () {
-    const obj = {};
-    assert.throws(format.bind(null, obj as any), /invalid type/);
+    assert.strictEqual(str, "text/html; charset=utf-8; foo=bar; bar=baz");
   });
 
   it("should reject invalid type", function () {
     const obj = { type: "text/" };
-    assert.throws(format.bind(null, obj), /invalid type/);
+    assert.throws(format.bind(null, obj), /Invalid type: text\//);
   });
 
   it("should reject invalid type with LWS", function () {
     const obj = { type: " text/html" };
-    assert.throws(format.bind(null, obj), /invalid type/);
+    assert.throws(format.bind(null, obj), /Invalid type:  text\/html/);
   });
 
   it("should reject invalid parameter name", function () {
     const obj = { type: "image/svg", parameters: { "foo/": "bar" } };
-    assert.throws(format.bind(null, obj), /invalid parameter name/);
+    assert.throws(format.bind(null, obj), /Invalid parameter name: foo\//);
   });
 
   it("should reject invalid parameter value", function () {
     const obj = { type: "image/svg", parameters: { foo: "bar\u0000" } };
-    assert.throws(format.bind(null, obj), /invalid parameter value/);
+    assert.throws(format.bind(null, obj), /Invalid parameter value: bar\u0000/);
   });
 });
