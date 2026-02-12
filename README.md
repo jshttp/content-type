@@ -17,13 +17,13 @@ $ npm install content-type
 ## API
 
 ```js
-var contentType = require("content-type");
+const contentType = require("content-type");
 ```
 
 ### contentType.parse(string)
 
 ```js
-var obj = contentType.parse("image/svg+xml; charset=utf-8");
+const obj = contentType.parse("image/svg+xml; charset=utf-8");
 ```
 
 Parse a `Content-Type` header. This will return an object with the following
@@ -40,7 +40,7 @@ Throws a `TypeError` if the string is missing or invalid.
 ### contentType.parse(req)
 
 ```js
-var obj = contentType.parse(req);
+const obj = contentType.parse(req);
 ```
 
 Parse the `Content-Type` header from the given `req`. Short-cut for
@@ -51,7 +51,7 @@ Throws a `TypeError` if the `Content-Type` header is missing or invalid.
 ### contentType.parse(res)
 
 ```js
-var obj = contentType.parse(res);
+const obj = contentType.parse(res);
 ```
 
 Parse the `Content-Type` header set on the given `res`. Short-cut for
@@ -62,7 +62,7 @@ Throws a `TypeError` if the `Content-Type` header is missing or invalid.
 ### contentType.format(obj)
 
 ```js
-var str = contentType.format({
+const str = contentType.format({
   type: "image/svg+xml",
   parameters: { charset: "utf-8" },
 });
@@ -85,7 +85,7 @@ Throws a `TypeError` if the object contains an invalid type or parameter names.
 
 [ci-image]: https://badgen.net/github/checks/jshttp/content-type/master?label=ci
 [ci-url]: https://github.com/jshttp/content-type/actions/workflows/ci.yml
-[coveralls-image]: https://badgen.net/coveralls/c/github/jshttp/content-type/master
+[coveralls-image]: https://badgen.net/codecov/c/github/jshttp/content-type/master
 [coveralls-url]: https://coveralls.io/r/jshttp/content-type?branch=master
 [node-image]: https://badgen.net/npm/node/content-type
 [node-url]: https://nodejs.org/en/download

@@ -1,7 +1,7 @@
 import { describe, it, assert } from "vitest";
 import { parse } from "./index";
 
-var invalidTypes = [
+const invalidTypes = [
   " ",
   "null",
   "undefined",
@@ -17,7 +17,7 @@ var invalidTypes = [
 
 describe("parse(string)", function () {
   it("should parse basic type", function () {
-    var type = parse("text/html");
+    const type = parse("text/html");
     assert.deepEqual(type, {
       type: "text/html",
       parameters: {},
@@ -25,7 +25,7 @@ describe("parse(string)", function () {
   });
 
   it("should parse with suffix", function () {
-    var type = parse("image/svg+xml");
+    const type = parse("image/svg+xml");
     assert.deepEqual(type, {
       type: "image/svg+xml",
       parameters: {},
@@ -33,7 +33,7 @@ describe("parse(string)", function () {
   });
 
   it("should parse basic type with surrounding OWS", function () {
-    var type = parse(" text/html ");
+    const type = parse(" text/html ");
     assert.deepEqual(type, {
       type: "text/html",
       parameters: {},
@@ -41,7 +41,7 @@ describe("parse(string)", function () {
   });
 
   it("should parse parameters", function () {
-    var type = parse("text/html; charset=utf-8; foo=bar");
+    const type = parse("text/html; charset=utf-8; foo=bar");
     assert.deepEqual(type, {
       type: "text/html",
       parameters: {
@@ -52,7 +52,7 @@ describe("parse(string)", function () {
   });
 
   it("should parse parameters with extra LWS", function () {
-    var type = parse("text/html ; charset=utf-8 ; foo=bar");
+    const type = parse("text/html ; charset=utf-8 ; foo=bar");
     assert.deepEqual(type, {
       type: "text/html",
       parameters: {
@@ -63,7 +63,7 @@ describe("parse(string)", function () {
   });
 
   it("should lower-case type", function () {
-    var type = parse("IMAGE/SVG+XML");
+    const type = parse("IMAGE/SVG+XML");
     assert.deepEqual(type, {
       type: "image/svg+xml",
       parameters: {},
@@ -71,7 +71,7 @@ describe("parse(string)", function () {
   });
 
   it("should lower-case parameter names", function () {
-    var type = parse("text/html; Charset=UTF-8");
+    const type = parse("text/html; Charset=UTF-8");
     assert.deepEqual(type, {
       type: "text/html",
       parameters: {
@@ -81,7 +81,7 @@ describe("parse(string)", function () {
   });
 
   it("should unquote parameter values", function () {
-    var type = parse('text/html; charset="UTF-8"');
+    const type = parse('text/html; charset="UTF-8"');
     assert.deepEqual(type, {
       type: "text/html",
       parameters: {
@@ -91,7 +91,7 @@ describe("parse(string)", function () {
   });
 
   it("should unquote parameter values with escapes", function () {
-    var type = parse('text/html; charset = "UT\\F-\\\\\\"8\\""');
+    const type = parse('text/html; charset = "UT\\F-\\\\\\"8\\""');
     assert.deepEqual(type, {
       type: "text/html",
       parameters: {
@@ -101,7 +101,7 @@ describe("parse(string)", function () {
   });
 
   it("should handle balanced quotes", function () {
-    var type = parse(
+    const type = parse(
       'text/html; param="charset=\\"utf-8\\"; foo=bar"; bar=foo',
     );
     assert.deepEqual(type, {
@@ -145,8 +145,8 @@ describe("parse(string)", function () {
 
 describe("parse(req)", function () {
   it("should parse content-type header", function () {
-    var req = { headers: { "content-type": "text/html" } };
-    var type = parse(req);
+    const req = { headers: { "content-type": "text/html" } };
+    const type = parse(req);
     assert.strictEqual(type.type, "text/html");
   });
 
@@ -155,19 +155,19 @@ describe("parse(req)", function () {
   });
 
   it("should reject missing content-type", function () {
-    var req = { headers: {} };
+    const req = { headers: {} };
     assert.throws(parse.bind(null, req), /content-type header is missing/);
   });
 });
 
 describe("parse(res)", function () {
   it("should parse content-type header", function () {
-    var res = {
+    const res = {
       getHeader: function () {
         return "text/html";
       },
     };
-    var type = parse(res);
+    const type = parse(res);
     assert.strictEqual(type.type, "text/html");
   });
 
@@ -176,7 +176,7 @@ describe("parse(res)", function () {
   });
 
   it("should reject missing content-type", function () {
-    var res = { getHeader: function () {} };
+    const res = { getHeader: function () {} };
     assert.throws(parse.bind(null, res), /content-type header is missing/);
   });
 });
