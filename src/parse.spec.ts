@@ -113,25 +113,59 @@ describe("parse(string)", function () {
     });
   });
 
+  it("should ignore extra semicolons", function () {
+    var type = parse("text/html;;;; charset=utf-8;; foo=bar;");
+    assert.deepEqual(type, {
+      type: "text/html",
+      parameters: {
+        charset: "utf-8",
+        foo: "bar",
+      },
+    });
+  });
+
   invalidTypes.forEach(function (type) {
     it("should throw on invalid media type " + type, function () {
       assert.throws(parse.bind(null, type), /invalid media type/);
     });
   });
 
-  it("should throw on invalid parameter format", function () {
-    assert.throws(
-      parse.bind(null, 'text/plain; foo="bar'),
-      /invalid parameter format/,
-    );
-    assert.throws(
-      parse.bind(null, "text/plain; profile=http://localhost; foo=bar"),
-      /invalid parameter format/,
-    );
-    assert.throws(
-      parse.bind(null, "text/plain; profile=http://localhost"),
-      /invalid parameter format/,
-    );
+  it("should omit unterminated quoted parameters", function () {
+    var type = parse('text/plain; foo="bar');
+    assert.deepEqual(type, {
+      type: "text/plain",
+      parameters: {},
+    });
+  });
+
+  it("should skip quoted parameters with non-OWS after closing quote", function () {
+    var type = parse('text/plain; foo="bar"xyz; baz=qux');
+    assert.deepEqual(type, {
+      type: "text/plain",
+      parameters: {
+        baz: "qux",
+      },
+    });
+  });
+
+  it("should allow quotes in unquoted parameter values", function () {
+    var type = parse('text/plain; foo=bar"baz');
+    assert.deepEqual(type, {
+      type: "text/plain",
+      parameters: {
+        foo: 'bar"baz',
+      },
+    });
+  });
+
+  it("should allow equals in unquoted parameter values", function () {
+    var type = parse("text/plain; foo=bar=baz");
+    assert.deepEqual(type, {
+      type: "text/plain",
+      parameters: {
+        foo: "bar=baz",
+      },
+    });
   });
 
   it("should require argument", function () {
