@@ -1,9 +1,7 @@
 {
   "name": "content-type",
-  "description": "Create and parse HTTP Content-Type header",
   "version": "1.0.5",
-  "author": "Douglas Christopher Wilson <doug@somethingdoug.com>",
-  "license": "MIT",
+  "description": "Create and parse HTTP Content-Type header",
   "keywords": [
     "content-type",
     "http",
@@ -16,31 +14,38 @@
     "type": "opencollective",
     "url": "https://opencollective.com/express"
   },
-  "devDependencies": {
-    "deep-equal": "1.0.1",
-    "eslint": "8.32.0",
-    "eslint-config-standard": "15.0.1",
-    "eslint-plugin-import": "2.27.5",
-    "eslint-plugin-node": "11.1.0",
-    "eslint-plugin-promise": "6.1.1",
-    "eslint-plugin-standard": "4.1.0",
-    "mocha": "10.2.0",
-    "nyc": "15.1.0"
-  },
+  "license": "MIT",
+  "author": "Douglas Christopher Wilson <doug@somethingdoug.com>",
+  "type": "commonjs",
+  "exports": "./dist/index.js",
+  "main": "./dist/index.js",
+  "typings": "./dist/index.d.ts",
   "files": [
-    "LICENSE",
-    "HISTORY.md",
-    "README.md",
-    "index.js"
+    "dist/"
   ],
-  "engines": {
-    "node": ">= 0.6"
-  },
   "scripts": {
-    "lint": "eslint .",
-    "test": "mocha --reporter spec --check-leaks --bail test/",
-    "test-ci": "nyc --reporter=lcovonly --reporter=text npm test",
-    "test-cov": "nyc --reporter=html --reporter=text npm test",
-    "version": "node scripts/version-history.js && git add HISTORY.md"
+    "build": "ts-scripts build",
+    "format": "ts-scripts format",
+    "lint": "ts-scripts lint",
+    "prepare": "ts-scripts install && npm run build",
+    "specs": "ts-scripts specs",
+    "test": "ts-scripts test"
+  },
+  "devDependencies": {
+    "@borderless/ts-scripts": "^0.15.0",
+    "@vitest/coverage-v8": "^3.0.5",
+    "typescript": "^5.7.3",
+    "vitest": "^3.2.4"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "ts-scripts": {
+    "dist": [
+      "dist"
+    ],
+    "project": [
+      "tsconfig.build.json"
+    ]
   }
 }

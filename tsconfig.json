@@ -1,0 +1,13 @@
+{
+  "extends": "@borderless/ts-scripts/configs/tsconfig.json",
+  "compilerOptions": {
+    "target": "ES2019",
+    "lib": ["ES2019"],
+    "rootDir": "src",
+    "outDir": "dist",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "types": []
+  },
+  "include": ["src/**/*"]
+}
