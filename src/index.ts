@@ -5,7 +5,7 @@
  */
 
 /**
- * RegExp to match *( ";" parameter ) in RFC 7231 sec 3.1.1.1
+ * RegExp to match *( ";" parameter ) in RFC 9110 sec 8.3.1
  *
  * parameter     = token "=" ( token / quoted-string )
  * token         = 1*tchar
@@ -25,7 +25,7 @@ const TEXT_REGEXP = /^[\u000b\u0020-\u007e\u0080-\u00ff]+$/; // eslint-disable-l
 const TOKEN_REGEXP = /^[!#$%&'*+.^_`|~0-9A-Za-z-]+$/;
 
 /**
- * RegExp to match quoted-pair in RFC 7230 sec 3.2.6
+ * RegExp to match quoted-pair in RFC 9110 sec 5.6.4
  *
  * quoted-pair = "\\" ( HTAB / SP / VCHAR / obs-text )
  * obs-text    = %x80-FF
@@ -33,12 +33,12 @@ const TOKEN_REGEXP = /^[!#$%&'*+.^_`|~0-9A-Za-z-]+$/;
 const QESC_REGEXP = /\\([\u000b\u0020-\u00ff])/g; // eslint-disable-line no-control-regex
 
 /**
- * RegExp to match chars that must be quoted-pair in RFC 7230 sec 3.2.6
+ * RegExp to match chars that must be quoted-pair in RFC 9110 sec 5.6.4
  */
 const QUOTE_REGEXP = /([\\"])/g;
 
 /**
- * RegExp to match type in RFC 7231 sec 3.1.1.1
+ * RegExp to match type in RFC 9110 sec 8.3.1
  *
  * media-type = type "/" subtype
  * type       = token

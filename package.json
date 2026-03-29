@@ -7,7 +7,7 @@
     "http",
     "req",
     "res",
-    "rfc7231"
+    "rfc9110"
   ],
   "repository": "jshttp/content-type",
   "funding": {

@@ -6,7 +6,7 @@
 [![Build Status][ci-image]][ci-url]
 [![Coverage Status][coveralls-image]][coveralls-url]
 
-Create and parse HTTP Content-Type header according to RFC 7231
+Create and parse HTTP Content-Type header according to RFC 9110
 
 ## Installation
 
