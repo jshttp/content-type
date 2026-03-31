@@ -137,15 +137,11 @@ function parseParameters(
           index++;
 
           let value = "";
+          let quoted = false;
           while (index < len) {
             const char = header[index++];
             if (char === '"') {
-              index = skipOWS(header, index, len);
-              if (index < len && header[index] !== ";") {
-                throw new TypeError("unexpected non-separator character");
-              }
-
-              parameters[key] = value;
+              quoted = true;
               break;
             }
 
@@ -157,6 +153,14 @@ function parseParameters(
             value += char;
           }
 
+          if (!quoted) throw new TypeError("unexpected end of input");
+
+          index = skipOWS(header, index, len);
+          if (index < len && header[index] !== ";") {
+            throw new TypeError("unexpected non-separator character");
+          }
+
+          parameters[key] = value;
           break;
         }
 

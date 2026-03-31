@@ -1,6 +1,5 @@
 import { describe, it, assert } from "vitest";
 import { parse } from "./index";
-import { a } from "vitest/dist/chunks/suite.d.FvehnV49.js";
 
 const invalidTypes = [
   " ",
@@ -131,12 +130,11 @@ describe("parse(string)", function () {
     });
   });
 
-  it("should omit unterminated quoted parameters", function () {
-    var type = parse('text/plain; foo="bar');
-    assert.deepEqual(type, {
-      type: "text/plain",
-      parameters: {},
-    });
+  it("should error on unterminated quoted parameter", function () {
+    assert.throws(
+      () => parse('text/plain; foo="bar'),
+      /unexpected end of input/,
+    );
   });
 
   it("should error on non-OWS after closing quote", function () {
