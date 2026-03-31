@@ -8,12 +8,12 @@ const TEXT_REGEXP = /^[\u000b\u0020-\u007e\u0080-\u00ff]+$/;
 const TOKEN_REGEXP = /^[!#$%&'*+.^_`|~0-9A-Za-z-]+$/;
 
 /**
- * RegExp to match chars that must be quoted-pair in RFC 7230 sec 3.2.6
+ * RegExp to match chars that must be quoted-pair in RFC 9110 sec 5.6.4
  */
 const QUOTE_REGEXP = /[\\"]/g;
 
 /**
- * RegExp to match type in RFC 7231 sec 3.1.1.1
+ * RegExp to match type in RFC 9110 sec 8.3.1
  *
  * media-type = type "/" subtype
  * type       = token
@@ -140,18 +140,12 @@ function parseParameters(
           while (index < len) {
             const char = header[index++];
             if (char === '"') {
-              let validTrailingOWS = true;
-
-              // Increment to next parameter.
-              while (index < len) {
-                const char = header[index];
-                if (char === ";") break;
-                validTrailingOWS &&= char === " " || char === "\t";
-                index++;
+              index = skipOWS(header, index, len);
+              if (index < len && header[index] !== ";") {
+                throw new TypeError("unexpected non-separator character");
               }
 
-              // Ignore parameters with non-OWS after closing quote as undefined behavior.
-              if (validTrailingOWS) parameters[key] = value;
+              parameters[key] = value;
               break;
             }
 
@@ -181,6 +175,11 @@ function parseParameters(
   return parameters;
 }
 
+/**
+ * Skip optional whitespace (OWS) in an HTTP header value.
+ *
+ * OWS is defined in RFC 9110 sec 5.6.3 as SP (" ") or HTAB ("\t").
+ */
 function skipOWS(header: string, index: number, len: number): number {
   while (index < len) {
     const code = header[index];
@@ -190,6 +189,11 @@ function skipOWS(header: string, index: number, len: number): number {
   return index;
 }
 
+/**
+ * Trim optional whitespace (OWS) from the end of a substring.
+ *
+ * OWS is defined in RFC 9110 sec 5.6.3 as SP (" ") or HTAB ("\t").
+ */
 function trailingOWS(header: string, start: number, end: number): number {
   while (end > start) {
     const code = header[end - 1];

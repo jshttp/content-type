@@ -1,5 +1,6 @@
 import { describe, it, assert } from "vitest";
 import { parse } from "./index";
+import { a } from "vitest/dist/chunks/suite.d.FvehnV49.js";
 
 const invalidTypes = [
   " ",
@@ -138,14 +139,11 @@ describe("parse(string)", function () {
     });
   });
 
-  it("should skip quoted parameters with non-OWS after closing quote", function () {
-    var type = parse('text/plain; foo="bar"xyz; baz=qux');
-    assert.deepEqual(type, {
-      type: "text/plain",
-      parameters: {
-        baz: "qux",
-      },
-    });
+  it("should error on non-OWS after closing quote", function () {
+    assert.throws(
+      parse.bind(null, 'text/plain; foo="bar"baz'),
+      /unexpected non-separator character/,
+    );
   });
 
   it("should allow quotes in unquoted parameter values", function () {
