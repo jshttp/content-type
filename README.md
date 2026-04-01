@@ -29,7 +29,9 @@ const obj = contentType.parse("image/svg+xml; charset=utf-8");
 Parse a `Content-Type` header. This will return an object with the following properties (examples are shown for the string `'image/svg+xml; charset=utf-8'`):
 
 - `type`: The media type. Example: `'image/svg+xml'`.
-- `parameters`: An object of the parameters in the media type (parameter name is always lower case). Example: `{charset: 'utf-8'}`.
+- `parameters`: An optional object of the parameters in the media type (parameter name is always lower case). Example: `{charset: 'utf-8'}`.
+
+The parser is lenient, but will throw a `TypeError` when unable to parse a parameter due to ambiguity. E.g. `foo="` where the quote is unterminated.
 
 ### contentType.format(obj)
 

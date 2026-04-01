@@ -16,6 +16,13 @@ const invalidTypes = [
 ];
 
 describe("parse(string)", function () {
+  it("should parse empty string", function () {
+    const type = parse("");
+    assert.deepEqual(type, {
+      type: "",
+    });
+  });
+
   it("should parse basic type", function () {
     const type = parse("text/html");
     assert.deepEqual(type, {
