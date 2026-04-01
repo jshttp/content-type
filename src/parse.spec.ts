@@ -173,6 +173,13 @@ describe("parse(string)", function () {
     );
   });
 
+  it("should error on backslash at end of input in quoted parameter", function () {
+    assert.throws(
+      () => parse('text/plain; foo="bar\\'),
+      /Unexpected end of input at index 21/,
+    );
+  });
+
   it("should error on non-OWS after closing quote", function () {
     assert.throws(
       parse.bind(null, 'text/plain; foo="bar"baz'),

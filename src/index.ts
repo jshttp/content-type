@@ -104,6 +104,7 @@ function parseParameters(
             }
 
             if (char === "\\") {
+              if (index === len) break;
               value += header[index++];
               continue;
             }
