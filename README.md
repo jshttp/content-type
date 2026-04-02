@@ -45,7 +45,7 @@ const str = contentType.format({
 Format an object into a `Content-Type` header. This will return a string of the content type for the given object with the following properties (examples are shown that produce the string `'image/svg+xml; charset=utf-8'`):
 
 - `type`: The media type (will be lower-cased). Example: `'image/svg+xml'`.
-- `parameters`: An object of the parameters in the media type (parameter name will be lower cased). Example: `{charset: 'utf-8'}`
+- `parameters`: An optional object of the parameters in the media type. Example: `{charset: 'utf-8'}`.
 
 Throws a `TypeError` if the object contains an invalid type or parameter names.
 

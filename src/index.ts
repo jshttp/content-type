@@ -22,11 +22,17 @@ const QUOTE_REGEXP = /[\\"]/g;
 const TYPE_REGEXP =
   /^[!#$%&'*+.^_`|~0-9A-Za-z-]+\/[!#$%&'*+.^_`|~0-9A-Za-z-]+$/;
 
+/**
+ * The content type object contains a type string and optional parameters.
+ */
 export interface ContentType {
-  parameters?: Record<string, string>;
   type: string;
+  parameters?: Record<string, string>;
 }
 
+/**
+ * Format an object into a `Content-Type` header.
+ */
 export function format(obj: ContentType): string {
   const { type, parameters } = obj;
 
@@ -49,6 +55,9 @@ export function format(obj: ContentType): string {
   return result;
 }
 
+/**
+ * Parse a `Content-Type` header.
+ */
 export function parse(header: string): ContentType {
   const len = header.length;
   const semiIndex = header.indexOf(";");
