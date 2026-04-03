@@ -23,6 +23,15 @@ const TYPE_REGEXP =
   /^[!#$%&'*+.^_`|~0-9A-Za-z-]+\/[!#$%&'*+.^_`|~0-9A-Za-z-]+$/;
 
 /**
+ * Null object perf optimization. Faster than `Object.create(null)` and `{ __proto__: null }`.
+ */
+const NullObject = /* @__PURE__ */ (() => {
+  const C = function () {};
+  C.prototype = Object.create(null);
+  return C;
+})() as unknown as { new (): any };
+
+/**
  * The content type object contains a type string and optional parameters.
  */
 export interface ContentType {
@@ -77,7 +86,7 @@ function parseParameters(
   index: number,
   len: number,
 ): Record<string, string> {
-  const parameters: Record<string, string> = Object.create(null);
+  const parameters: Record<string, string> = new NullObject();
 
   parameter: while (index < len) {
     index = skipOWS(header, index + 1, len);
