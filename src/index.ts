@@ -119,6 +119,7 @@ function parseParameters(
               }
 
               parameters[key] = value;
+              index++;
               continue parameter;
             }
 
@@ -141,6 +142,7 @@ function parseParameters(
 
         const valueEnd = trailingOWS(header, valueStart, index);
         parameters[key] = header.slice(valueStart, valueEnd);
+        index++;
         continue parameter;
       }
 
