@@ -7,7 +7,7 @@ const invalidTypes = [
   "undefined",
   "/",
   "text / plain",
-  "text/;plain",
+  "text/$plain",
   'text/"plain"',
   "text/p£ain",
   "text/(plain)",
@@ -16,11 +16,23 @@ const invalidTypes = [
 ];
 
 describe("parse(string)", function () {
+  it("should parse empty string", function () {
+    const type = parse("");
+    assert.deepEqual(type, {
+      type: "",
+    });
+  });
+
   it("should parse basic type", function () {
     const type = parse("text/html");
     assert.deepEqual(type, {
       type: "text/html",
-      parameters: {},
+    });
+  });
+
+  it.each(invalidTypes)("should accept invalid types: %s", function (str) {
+    assert.deepEqual(parse(str), {
+      type: str.trim().toLowerCase(),
     });
   });
 
@@ -28,7 +40,6 @@ describe("parse(string)", function () {
     const type = parse("image/svg+xml");
     assert.deepEqual(type, {
       type: "image/svg+xml",
-      parameters: {},
     });
   });
 
@@ -36,7 +47,6 @@ describe("parse(string)", function () {
     const type = parse(" text/html ");
     assert.deepEqual(type, {
       type: "text/html",
-      parameters: {},
     });
   });
 
@@ -62,11 +72,50 @@ describe("parse(string)", function () {
     });
   });
 
+  it("should parse empty parameter value", function () {
+    const type = parse("text/html; charset=");
+    assert.deepEqual(type, {
+      type: "text/html",
+      parameters: {
+        charset: "",
+      },
+    });
+  });
+
+  it("should parse empty parameter value with quotes", function () {
+    const type = parse('text/html; charset=""');
+    assert.deepEqual(type, {
+      type: "text/html",
+      parameters: {
+        charset: "",
+      },
+    });
+  });
+
+  it("should parse empty parameter value with OWS", function () {
+    const type = parse("text/html; charset= ");
+    assert.deepEqual(type, {
+      type: "text/html",
+      parameters: {
+        charset: "",
+      },
+    });
+  });
+
+  it("should parse parameters with OWS around equals", function () {
+    const type = parse("text/html; charset = utf-8");
+    assert.deepEqual(type, {
+      type: "text/html",
+      parameters: {
+        charset: "utf-8",
+      },
+    });
+  });
+
   it("should lower-case type", function () {
     const type = parse("IMAGE/SVG+XML");
     assert.deepEqual(type, {
       type: "image/svg+xml",
-      parameters: {},
     });
   });
 
@@ -113,70 +162,55 @@ describe("parse(string)", function () {
     });
   });
 
-  invalidTypes.forEach(function (type) {
-    it("should throw on invalid media type " + type, function () {
-      assert.throws(parse.bind(null, type), /invalid media type/);
+  it("should ignore extra semicolons", function () {
+    var type = parse("text/html;;;; charset=utf-8;; foo=bar;");
+    assert.deepEqual(type, {
+      type: "text/html",
+      parameters: {
+        charset: "utf-8",
+        foo: "bar",
+      },
     });
   });
 
-  it("should throw on invalid parameter format", function () {
+  it("should error on unterminated quoted parameter", function () {
     assert.throws(
-      parse.bind(null, 'text/plain; foo="bar'),
-      /invalid parameter format/,
-    );
-    assert.throws(
-      parse.bind(null, "text/plain; profile=http://localhost; foo=bar"),
-      /invalid parameter format/,
-    );
-    assert.throws(
-      parse.bind(null, "text/plain; profile=http://localhost"),
-      /invalid parameter format/,
+      () => parse('text/plain; foo="bar'),
+      /Unexpected end of input at index 20/,
     );
   });
 
-  it("should require argument", function () {
-    assert.throws(parse.bind(null, undefined as any), /string.*required/);
+  it("should error on backslash at end of input in quoted parameter", function () {
+    assert.throws(
+      () => parse('text/plain; foo="bar\\'),
+      /Unexpected end of input at index 21/,
+    );
   });
 
-  it("should reject non-strings", function () {
-    assert.throws(parse.bind(null, 7 as any), /string.*required/);
-  });
-});
-
-describe("parse(req)", function () {
-  it("should parse content-type header", function () {
-    const req = { headers: { "content-type": "text/html" } };
-    const type = parse(req);
-    assert.strictEqual(type.type, "text/html");
+  it("should error on non-OWS after closing quote", function () {
+    assert.throws(
+      parse.bind(null, 'text/plain; foo="bar"baz'),
+      /Unexpected characters after parameter at index 21/,
+    );
   });
 
-  it("should reject objects without headers property", function () {
-    assert.throws(parse.bind(null, {}), /content-type header is missing/);
-  });
-
-  it("should reject missing content-type", function () {
-    const req = { headers: {} };
-    assert.throws(parse.bind(null, req), /content-type header is missing/);
-  });
-});
-
-describe("parse(res)", function () {
-  it("should parse content-type header", function () {
-    const res = {
-      getHeader: function () {
-        return "text/html";
+  it("should allow quotes in unquoted parameter values", function () {
+    var type = parse('text/plain; foo=bar"baz');
+    assert.deepEqual(type, {
+      type: "text/plain",
+      parameters: {
+        foo: 'bar"baz',
       },
-    };
-    const type = parse(res);
-    assert.strictEqual(type.type, "text/html");
+    });
   });
 
-  it("should reject objects without getHeader method", function () {
-    assert.throws(parse.bind(null, {}), /content-type header is missing/);
-  });
-
-  it("should reject missing content-type", function () {
-    const res = { getHeader: function () {} };
-    assert.throws(parse.bind(null, res), /content-type header is missing/);
+  it("should allow equals in unquoted parameter values", function () {
+    var type = parse("text/plain; foo=bar=baz");
+    assert.deepEqual(type, {
+      type: "text/plain",
+      parameters: {
+        foo: "bar=baz",
+      },
+    });
   });
 });
