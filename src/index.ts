@@ -56,9 +56,16 @@ export function format(obj: ContentType): string {
 }
 
 /**
+ * Options for parsing a `Content-Type` header.
+ */
+export interface ParseOptions {
+  parameters?: boolean;
+}
+
+/**
  * Parse a `Content-Type` header.
  */
-export function parse(header: string): ContentType {
+export function parse(header: string, options?: ParseOptions): ContentType {
   const len = header.length;
   const semiIndex = header.indexOf(";");
   const end = semiIndex !== -1 ? semiIndex : len;
@@ -66,9 +73,9 @@ export function parse(header: string): ContentType {
   const valueEnd = trailingOWS(header, valueStart, end);
   const type = header.slice(valueStart, valueEnd).toLowerCase();
 
-  if (semiIndex === -1) return { type };
+  if (semiIndex === -1 || options?.parameters === false) return { type };
 
-  const parameters = parseParameters(header, end, len);
+  const parameters = parseParameters(header, end + 1, len);
   return { type, parameters };
 }
 
@@ -80,13 +87,16 @@ function parseParameters(
   const parameters: Record<string, string> = Object.create(null);
 
   parameter: while (index < len) {
-    index = skipOWS(header, index + 1, len);
+    index = skipOWS(header, index, len);
 
     const keyStart = index;
 
     while (index < len) {
       const char = header[index];
-      if (char === ";") continue parameter;
+      if (char === ";") {
+        index++;
+        continue parameter;
+      }
 
       if (char === "=") {
         const keyEnd = trailingOWS(header, keyStart, index);

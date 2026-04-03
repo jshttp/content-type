@@ -20,7 +20,7 @@ npm install content-type
 const contentType = require("content-type");
 ```
 
-### contentType.parse(string)
+### contentType.parse(string, options?)
 
 ```js
 const obj = contentType.parse("image/svg+xml; charset=utf-8");
@@ -32,6 +32,10 @@ Parse a `Content-Type` header. This will return an object with the following pro
 - `parameters`: An optional object of the parameters in the media type (parameter name is always lower case). Example: `{charset: 'utf-8'}`.
 
 The parser is lenient, but will throw a `TypeError` when unable to parse a parameter due to ambiguity. E.g. `foo="` where the quote is unterminated.
+
+#### Options
+
+- `parameters` (default: `true`): Set to `false` to skip parsing parameters, only returns `type`.
 
 ### contentType.format(obj)
 

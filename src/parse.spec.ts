@@ -213,4 +213,13 @@ describe("parse(string)", function () {
       },
     });
   });
+
+  it("should skip parsing parameters when options.parameters is false", function () {
+    const type = parse("text/html; charset=utf-8; foo=bar", {
+      parameters: false,
+    });
+    assert.deepEqual(type, {
+      type: "text/html",
+    });
+  });
 });
