@@ -104,7 +104,7 @@ function parseParameters(
 
         index = skipOWS(header, index + 1, len);
 
-        if (header[index] === '"') {
+        if (index < len && header[index] === '"') {
           index++;
 
           let value = "";
