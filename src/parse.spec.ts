@@ -190,7 +190,7 @@ describe("parse(string)", function () {
   it("should error on non-OWS after closing quote", function () {
     assert.throws(
       parse.bind(null, 'text/plain; foo="bar"baz'),
-      /Unexpected characters after parameter at index 21/,
+      /Unexpected character at index 21/,
     );
   });
 
@@ -211,6 +211,15 @@ describe("parse(string)", function () {
       parameters: {
         foo: "bar=baz",
       },
+    });
+  });
+
+  it("should skip parsing parameters when options.parameters is false", function () {
+    const type = parse("text/html; charset=utf-8; foo=bar", {
+      parameters: false,
+    });
+    assert.deepEqual(type, {
+      type: "text/html",
     });
   });
 });

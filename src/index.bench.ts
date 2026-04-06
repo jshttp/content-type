@@ -21,6 +21,10 @@ describe("parse", () => {
     parse(PARAMS_HEADER);
   });
 
+  bench("simple parameters (options.parameters = false)", () => {
+    parse(PARAMS_HEADER, { parameters: false });
+  });
+
   bench("quoted and escaped parameters", () => {
     parse(QUOTED_HEADER);
   });
