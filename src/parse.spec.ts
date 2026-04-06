@@ -190,7 +190,7 @@ describe("parse(string)", function () {
   it("should error on non-OWS after closing quote", function () {
     assert.throws(
       parse.bind(null, 'text/plain; foo="bar"baz'),
-      /Unexpected characters after parameter at index 21/,
+      /Unexpected character at index 21/,
     );
   });
 

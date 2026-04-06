@@ -113,9 +113,7 @@ function parseParameters(
             if (char === '"') {
               index = skipOWS(header, index, len);
               if (index < len && header[index] !== ";") {
-                throw new TypeError(
-                  `Unexpected characters after parameter at index ${index}`,
-                );
+                throw new TypeError(`Unexpected character at index ${index}`);
               }
 
               parameters[key] = value;
