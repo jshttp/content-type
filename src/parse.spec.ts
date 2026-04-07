@@ -20,6 +20,7 @@ describe("parse(string)", function () {
     const type = parse("");
     assert.deepEqual(type, {
       type: "",
+      parameters: {},
     });
   });
 
@@ -27,12 +28,14 @@ describe("parse(string)", function () {
     const type = parse("text/html");
     assert.deepEqual(type, {
       type: "text/html",
+      parameters: {},
     });
   });
 
   it.each(invalidTypes)("should accept invalid types: %s", function (str) {
     assert.deepEqual(parse(str), {
       type: str.trim().toLowerCase(),
+      parameters: {},
     });
   });
 
@@ -40,6 +43,7 @@ describe("parse(string)", function () {
     const type = parse("image/svg+xml");
     assert.deepEqual(type, {
       type: "image/svg+xml",
+      parameters: {},
     });
   });
 
@@ -47,6 +51,7 @@ describe("parse(string)", function () {
     const type = parse(" text/html ");
     assert.deepEqual(type, {
       type: "text/html",
+      parameters: {},
     });
   });
 
@@ -116,6 +121,7 @@ describe("parse(string)", function () {
     const type = parse("IMAGE/SVG+XML");
     assert.deepEqual(type, {
       type: "image/svg+xml",
+      parameters: {},
     });
   });
 
@@ -163,7 +169,7 @@ describe("parse(string)", function () {
   });
 
   it("should ignore extra semicolons", function () {
-    var type = parse("text/html;;;; charset=utf-8;; foo=bar;");
+    const type = parse("text/html;;;; charset=utf-8;; foo=bar;");
     assert.deepEqual(type, {
       type: "text/html",
       parameters: {
@@ -173,29 +179,42 @@ describe("parse(string)", function () {
     });
   });
 
-  it("should error on unterminated quoted parameter", function () {
-    assert.throws(
-      () => parse('text/plain; foo="bar'),
-      /Unexpected end of input at index 20/,
-    );
+  it("should ignore unterminated quoted parameter", function () {
+    assert.deepEqual(parse('text/plain; foo="bar'), {
+      type: "text/plain",
+      parameters: {},
+    });
   });
 
-  it("should error on backslash at end of input in quoted parameter", function () {
-    assert.throws(
-      () => parse('text/plain; foo="bar\\'),
-      /Unexpected end of input at index 21/,
-    );
+  it("should ignore unterminated quoted parameter with backslash", function () {
+    assert.deepEqual(parse('text/plain; foo="bar\\'), {
+      type: "text/plain",
+      parameters: {},
+    });
   });
 
-  it("should error on non-OWS after closing quote", function () {
-    assert.throws(
-      parse.bind(null, 'text/plain; foo="bar"baz'),
-      /Unexpected character at index 21/,
-    );
+  it("should parse and ignore non-OWS after closing quote", function () {
+    assert.deepEqual(parse('text/plain; foo="bar"baz'), {
+      type: "text/plain",
+      parameters: {
+        foo: "bar",
+      },
+    });
+  });
+
+  it("should continue parsing after non-OWS", function () {
+    const type = parse('text/plain; foo="bar"baz; charset=utf-8');
+    assert.deepEqual(type, {
+      type: "text/plain",
+      parameters: {
+        foo: "bar",
+        charset: "utf-8",
+      },
+    });
   });
 
   it("should allow quotes in unquoted parameter values", function () {
-    var type = parse('text/plain; foo=bar"baz');
+    const type = parse('text/plain; foo=bar"baz');
     assert.deepEqual(type, {
       type: "text/plain",
       parameters: {
@@ -205,7 +224,7 @@ describe("parse(string)", function () {
   });
 
   it("should allow equals in unquoted parameter values", function () {
-    var type = parse("text/plain; foo=bar=baz");
+    const type = parse("text/plain; foo=bar=baz");
     assert.deepEqual(type, {
       type: "text/plain",
       parameters: {
@@ -220,6 +239,7 @@ describe("parse(string)", function () {
     });
     assert.deepEqual(type, {
       type: "text/html",
+      parameters: {},
     });
   });
 });

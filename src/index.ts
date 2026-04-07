@@ -36,13 +36,13 @@ const NullObject = /* @__PURE__ */ (() => {
  */
 export interface ContentType {
   type: string;
-  parameters?: Record<string, string>;
+  parameters: Record<string, string>;
 }
 
 /**
  * Format an object into a `Content-Type` header.
  */
-export function format(obj: ContentType): string {
+export function format(obj: Partial<ContentType>): string {
   const { type, parameters } = obj;
 
   if (!type || !TYPE_REGEXP.test(type)) {
@@ -76,18 +76,30 @@ export interface ParseOptions {
  */
 export function parse(header: string, options?: ParseOptions): ContentType {
   const len = header.length;
-  const semiIndex = header.indexOf(";");
-  const end = semiIndex !== -1 ? semiIndex : len;
-  const valueStart = skipOWS(header, 0, end);
-  const valueEnd = trailingOWS(header, valueStart, end);
+  let index = skipOWS(header, 0, len);
+
+  const valueStart = index;
+  index = skipValue(header, index, len);
+  const valueEnd = trailingOWS(header, valueStart, index);
   const type = header.slice(valueStart, valueEnd).toLowerCase();
+  const parameters =
+    options && options.parameters === false
+      ? new NullObject()
+      : parseParameters(header, index, len);
 
-  if (semiIndex === -1 || options?.parameters === false) return { type };
-
-  const parameters = parseParameters(header, end + 1, len);
   return { type, parameters };
 }
 
+const SP = 32; // " "
+const HTAB = 9; // "\t"
+const SEMI = 59; // ";"
+const EQ = 61; // "="
+const DQUOTE = 34; // '"'
+const BSLASH = 92; // "\\"
+
+/**
+ * Parses the parameters of a `Content-Type` header starting at the given index.
+ */
 function parseParameters(
   header: string,
   index: number,
@@ -96,60 +108,47 @@ function parseParameters(
   const parameters: Record<string, string> = new NullObject();
 
   parameter: while (index < len) {
-    index = skipOWS(header, index, len);
+    index = skipOWS(header, index + 1 /* Skip over ; */, len);
 
     const keyStart = index;
 
     while (index < len) {
-      const char = header[index];
-      if (char === ";") {
-        index++;
-        continue parameter;
-      }
+      const code = header.charCodeAt(index);
+      if (code === SEMI) continue parameter;
 
-      if (char === "=") {
+      if (code === EQ) {
         const keyEnd = trailingOWS(header, keyStart, index);
         const key = header.slice(keyStart, keyEnd).toLowerCase();
 
         index = skipOWS(header, index + 1, len);
 
-        if (index < len && header[index] === '"') {
+        if (index < len && header.charCodeAt(index) === DQUOTE) {
           index++;
 
           let value = "";
           while (index < len) {
-            const char = header[index++];
-            if (char === '"') {
-              index = skipOWS(header, index, len);
-              if (index < len && header[index] !== ";") {
-                throw new TypeError(`Unexpected character at index ${index}`);
-              }
-
+            const code = header.charCodeAt(index++);
+            if (code === DQUOTE) {
+              index = skipValue(header, index, len);
               parameters[key] = value;
-              index++;
-              continue parameter;
+              break;
             }
 
-            if (char === "\\") {
-              if (index === len) break;
+            if (code === BSLASH && index < len) {
               value += header[index++];
               continue;
             }
 
-            value += char;
+            value += String.fromCharCode(code);
           }
 
-          throw new TypeError(`Unexpected end of input at index ${index}`);
+          continue parameter;
         }
 
         const valueStart = index;
-        while (index < len && header[index] !== ";") {
-          index++;
-        }
-
+        index = skipValue(header, index, len);
         const valueEnd = trailingOWS(header, valueStart, index);
         parameters[key] = header.slice(valueStart, valueEnd);
-        index++;
         continue parameter;
       }
 
@@ -161,14 +160,26 @@ function parseParameters(
 }
 
 /**
+ * Skip over characters until a semicolon.
+ */
+function skipValue(str: string, index: number, len: number): number {
+  while (index < len) {
+    const char = str.charCodeAt(index);
+    if (char === SEMI) break;
+    index++;
+  }
+  return index;
+}
+
+/**
  * Skip optional whitespace (OWS) in an HTTP header value.
  *
  * OWS is defined in RFC 9110 sec 5.6.3 as SP (" ") or HTAB ("\t").
  */
 function skipOWS(header: string, index: number, len: number): number {
   while (index < len) {
-    const char = header[index];
-    if (char !== " " && char !== "\t") break;
+    const char = header.charCodeAt(index);
+    if (char !== SP && char !== HTAB) break;
     index++;
   }
   return index;
@@ -181,13 +192,16 @@ function skipOWS(header: string, index: number, len: number): number {
  */
 function trailingOWS(header: string, start: number, end: number): number {
   while (end > start) {
-    const char = header[end - 1];
-    if (char !== " " && char !== "\t") break;
+    const char = header.charCodeAt(end - 1);
+    if (char !== SP && char !== HTAB) break;
     end--;
   }
   return end;
 }
 
+/**
+ * Serialize a parameter value.
+ */
 function qstring(str: string): string {
   if (TOKEN_REGEXP.test(str)) return str;
   if (TEXT_REGEXP.test(str)) return `"${str.replace(QUOTE_REGEXP, "\\$&")}"`;
