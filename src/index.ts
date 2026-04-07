@@ -83,7 +83,7 @@ export function parse(header: string, options?: ParseOptions): ContentType {
   const valueEnd = trailingOWS(header, valueStart, index);
   const type = header.slice(valueStart, valueEnd).toLowerCase();
   const parameters =
-    options && options.parameters === false
+    options?.parameters === false
       ? new NullObject()
       : parseParameters(header, index, len);
 
