@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-const TEXT_REGEXP = /^[\u000b\u0020-\u007e\u0080-\u00ff]*$/;
+const TEXT_REGEXP = /^[\u0009\u0020-\u007e\u0080-\u00ff]*$/;
 const TOKEN_REGEXP = /^[!#$%&'*+.^_`|~0-9A-Za-z-]+$/;
 
 /**
