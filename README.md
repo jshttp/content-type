@@ -1,10 +1,10 @@
 # content-type
 
-[![NPM Version][npm-version-image]][npm-url]
-[![NPM Downloads][npm-downloads-image]][npm-url]
-[![Node.js Version][node-image]][node-url]
-[![Build Status][ci-image]][ci-url]
-[![Coverage Status][coveralls-image]][coveralls-url]
+[![NPM version][npm-image]][npm-url]
+[![NPM downloads][downloads-image]][downloads-url]
+[![Build status][build-image]][build-url]
+[![Build coverage][coverage-image]][coverage-url]
+[![License][license-image]][license-url]
 
 Create and parse HTTP `Content-Type` header.
 
@@ -57,12 +57,13 @@ Throws a `TypeError` if the object contains an invalid type or parameter names.
 
 [MIT](LICENSE)
 
-[ci-image]: https://badgen.net/github/checks/jshttp/content-type/master?label=ci
-[ci-url]: https://github.com/jshttp/content-type/actions/workflows/ci.yml
-[coveralls-image]: https://badgen.net/codecov/c/github/jshttp/content-type/master
-[coveralls-url]: https://codecov.io/gh/jshttp/content-type
-[node-image]: https://badgen.net/npm/node/content-type
-[node-url]: https://nodejs.org/en/download
-[npm-downloads-image]: https://badgen.net/npm/dm/content-type
+[npm-image]: https://img.shields.io/npm/v/content-type
 [npm-url]: https://npmjs.org/package/content-type
-[npm-version-image]: https://badgen.net/npm/v/content-type
+[downloads-image]: https://img.shields.io/npm/dm/content-type
+[downloads-url]: https://npmjs.org/package/content-type
+[build-image]: https://img.shields.io/github/actions/workflow/status/jshttp/content-type/ci.yml?branch=master
+[build-url]: https://github.com/jshttp/content-type/actions/workflows/ci.yml?query=branch%3Amaster
+[coverage-image]: https://img.shields.io/codecov/c/gh/jshttp/content-type
+[coverage-url]: https://codecov.io/gh/jshttp/content-type
+[license-image]: http://img.shields.io/npm/l/content-type.svg?style=flat
+[license-url]: LICENSE.md
