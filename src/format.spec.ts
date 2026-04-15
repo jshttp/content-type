@@ -12,6 +12,27 @@ describe("format(obj)", function () {
     assert.strictEqual(str, "image/svg+xml");
   });
 
+  it("should keep type case", function () {
+    const str = format({ type: "IMAGE/SVG+XML" });
+    assert.strictEqual(str, "IMAGE/SVG+XML");
+  });
+
+  it("should keep parameter case", function () {
+    const str = format({
+      type: "text/html",
+      parameters: { Charset: "utf-8" },
+    });
+    assert.strictEqual(str, "text/html; Charset=utf-8");
+  });
+
+  it("should keep duplicate parameters case", function () {
+    const str = format({
+      type: "text/html",
+      parameters: { Charset: "utf-8", charset: "iso-8859-1" },
+    });
+    assert.strictEqual(str, "text/html; Charset=utf-8; charset=iso-8859-1");
+  });
+
   it("should format type with parameter", function () {
     const str = format({
       type: "text/html",
