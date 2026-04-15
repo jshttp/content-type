@@ -63,4 +63,17 @@ describe("format(obj)", function () {
     const obj = { type: "image/svg", parameters: { foo: "bar\u0000" } };
     assert.throws(format.bind(null, obj), /Invalid parameter value: bar\u0000/);
   });
+
+  it("should quote parameter value containing HTAB", function () {
+    const str = format({
+      type: "text/html",
+      parameters: { foo: "bar\tbaz" },
+    });
+    assert.strictEqual(str, 'text/html; foo="bar\tbaz"');
+  });
+
+  it("should reject parameter value containing vertical tab", function () {
+    const obj = { type: "text/html", parameters: { foo: "bar\u000bbaz" } };
+    assert.throws(format.bind(null, obj), /Invalid parameter value/);
+  });
 });
