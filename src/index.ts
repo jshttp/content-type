@@ -130,7 +130,7 @@ function parseParameters(
             const code = header.charCodeAt(index++);
             if (code === DQUOTE) {
               index = skipValue(header, index, len);
-              parameters[key] = value;
+              if (parameters[key] === undefined) parameters[key] = value;
               break;
             }
 
@@ -147,8 +147,12 @@ function parseParameters(
 
         const valueStart = index;
         index = skipValue(header, index, len);
-        const valueEnd = trailingOWS(header, valueStart, index);
-        parameters[key] = header.slice(valueStart, valueEnd);
+
+        if (parameters[key] === undefined) {
+          const valueEnd = trailingOWS(header, valueStart, index);
+          parameters[key] = header.slice(valueStart, valueEnd);
+        }
+
         continue parameter;
       }
 
