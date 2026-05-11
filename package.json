@@ -1,6 +1,6 @@
 {
   "name": "content-type",
-  "version": "1.0.5",
+  "version": "2.0.0",
   "description": "Create and parse HTTP Content-Type header",
   "keywords": [
     "content-type",
