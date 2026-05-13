@@ -212,3 +212,5 @@ function qstring(str: string): string {
 
   throw new TypeError(`Invalid parameter value: ${str}`);
 }
+
+export default { format, parse };
