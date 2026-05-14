@@ -67,22 +67,25 @@ describe("format(obj)", function () {
 
   it("should reject invalid type", function () {
     const obj = { type: "text/" };
-    assert.throws(format.bind(null, obj), /Invalid type: text\//);
+    assert.throws(format.bind(null, obj), /Invalid type: "text\/"/);
   });
 
   it("should reject invalid type with LWS", function () {
     const obj = { type: " text/html" };
-    assert.throws(format.bind(null, obj), /Invalid type:  text\/html/);
+    assert.throws(format.bind(null, obj), /Invalid type: " text\/html"/);
   });
 
   it("should reject invalid parameter name", function () {
     const obj = { type: "image/svg", parameters: { "foo/": "bar" } };
-    assert.throws(format.bind(null, obj), /Invalid parameter name: foo\//);
+    assert.throws(format.bind(null, obj), /Invalid parameter name: "foo\/"/);
   });
 
   it("should reject invalid parameter value", function () {
     const obj = { type: "image/svg", parameters: { foo: "bar\u0000" } };
-    assert.throws(format.bind(null, obj), /Invalid parameter value: bar\u0000/);
+    assert.throws(
+      format.bind(null, obj),
+      /Invalid parameter value: "bar\\u0000"/,
+    );
   });
 
   it("should quote parameter value containing HTAB", function () {

@@ -46,7 +46,7 @@ export function format(obj: Partial<ContentType>): string {
   const { type, parameters } = obj;
 
   if (!type || !TYPE_REGEXP.test(type)) {
-    throw new TypeError(`Invalid type: ${type}`);
+    throw new TypeError(`Invalid type: ${JSON.stringify(type)}`);
   }
 
   let result = type;
@@ -54,7 +54,7 @@ export function format(obj: Partial<ContentType>): string {
   if (parameters) {
     for (const param of Object.keys(parameters)) {
       if (!TOKEN_REGEXP.test(param)) {
-        throw new TypeError(`Invalid parameter name: ${param}`);
+        throw new TypeError(`Invalid parameter name: ${JSON.stringify(param)}`);
       }
 
       result += `; ${param}=${qstring(parameters[param])}`;
@@ -210,5 +210,5 @@ function qstring(str: string): string {
   if (TOKEN_REGEXP.test(str)) return str;
   if (TEXT_REGEXP.test(str)) return `"${str.replace(QUOTE_REGEXP, "\\$&")}"`;
 
-  throw new TypeError(`Invalid parameter value: ${str}`);
+  throw new TypeError(`Invalid parameter value: ${JSON.stringify(str)}`);
 }
