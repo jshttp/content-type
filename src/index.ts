@@ -95,7 +95,7 @@ export interface ParseOptions {
  * Parse a `Content-Type` header.
  */
 export function parse(header: string, options?: ParseOptions): ContentType {
-  const stopChar = options?.comma === true ? COMMA : -1;
+  const stopChar = options?.comma === true ? COMMA : 65_536; // Sentinel for "no stop char".
   const len = header.length;
   let index = skipOWS(header, options?.start ?? 0, len);
 
