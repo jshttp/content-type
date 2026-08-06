@@ -20,6 +20,7 @@ describe("parse(string)", function () {
     const type = parse("");
     assert.deepEqual(type, {
       type: "",
+      index: 0,
       parameters: {},
     });
   });
@@ -28,6 +29,7 @@ describe("parse(string)", function () {
     const type = parse("text/html");
     assert.deepEqual(type, {
       type: "text/html",
+      index: 9,
       parameters: {},
     });
   });
@@ -35,6 +37,7 @@ describe("parse(string)", function () {
   it.each(invalidTypes)("should accept invalid types: %s", function (str) {
     assert.deepEqual(parse(str), {
       type: str.trim().toLowerCase(),
+      index: str.length,
       parameters: {},
     });
   });
@@ -43,6 +46,7 @@ describe("parse(string)", function () {
     const type = parse("image/svg+xml");
     assert.deepEqual(type, {
       type: "image/svg+xml",
+      index: 13,
       parameters: {},
     });
   });
@@ -51,6 +55,7 @@ describe("parse(string)", function () {
     const type = parse(" text/html ");
     assert.deepEqual(type, {
       type: "text/html",
+      index: 11,
       parameters: {},
     });
   });
@@ -59,6 +64,7 @@ describe("parse(string)", function () {
     const type = parse("text/html; charset=utf-8; foo=bar");
     assert.deepEqual(type, {
       type: "text/html",
+      index: 33,
       parameters: {
         charset: "utf-8",
         foo: "bar",
@@ -70,6 +76,7 @@ describe("parse(string)", function () {
     const type = parse("text/html ; charset=utf-8 ; foo=bar");
     assert.deepEqual(type, {
       type: "text/html",
+      index: 35,
       parameters: {
         charset: "utf-8",
         foo: "bar",
@@ -81,6 +88,7 @@ describe("parse(string)", function () {
     const type = parse("text/html; charset=");
     assert.deepEqual(type, {
       type: "text/html",
+      index: 19,
       parameters: {
         charset: "",
       },
@@ -91,6 +99,7 @@ describe("parse(string)", function () {
     const type = parse('text/html; charset=""');
     assert.deepEqual(type, {
       type: "text/html",
+      index: 21,
       parameters: {
         charset: "",
       },
@@ -101,6 +110,7 @@ describe("parse(string)", function () {
     const type = parse("text/html; charset= ");
     assert.deepEqual(type, {
       type: "text/html",
+      index: 20,
       parameters: {
         charset: "",
       },
@@ -111,6 +121,7 @@ describe("parse(string)", function () {
     const type = parse("text/html; charset = utf-8");
     assert.deepEqual(type, {
       type: "text/html",
+      index: 26,
       parameters: {
         charset: "utf-8",
       },
@@ -121,6 +132,7 @@ describe("parse(string)", function () {
     const type = parse("IMAGE/SVG+XML");
     assert.deepEqual(type, {
       type: "image/svg+xml",
+      index: 13,
       parameters: {},
     });
   });
@@ -129,6 +141,7 @@ describe("parse(string)", function () {
     const type = parse("text/html; Charset=UTF-8");
     assert.deepEqual(type, {
       type: "text/html",
+      index: 24,
       parameters: {
         charset: "UTF-8",
       },
@@ -139,6 +152,7 @@ describe("parse(string)", function () {
     const type = parse('text/html; charset="UTF-8"');
     assert.deepEqual(type, {
       type: "text/html",
+      index: 26,
       parameters: {
         charset: "UTF-8",
       },
@@ -149,6 +163,7 @@ describe("parse(string)", function () {
     const type = parse('text/html; charset = "UT\\F-\\\\\\"8\\""');
     assert.deepEqual(type, {
       type: "text/html",
+      index: 35,
       parameters: {
         charset: 'UTF-\\"8"',
       },
@@ -161,6 +176,7 @@ describe("parse(string)", function () {
     );
     assert.deepEqual(type, {
       type: "text/html",
+      index: 54,
       parameters: {
         param: 'charset="utf-8"; foo=bar',
         bar: "foo",
@@ -172,6 +188,7 @@ describe("parse(string)", function () {
     const type = parse("text/html;;;; charset=utf-8;; foo=bar;");
     assert.deepEqual(type, {
       type: "text/html",
+      index: 38,
       parameters: {
         charset: "utf-8",
         foo: "bar",
@@ -182,6 +199,7 @@ describe("parse(string)", function () {
   it("should ignore unterminated quoted parameter", function () {
     assert.deepEqual(parse('text/plain; foo="bar'), {
       type: "text/plain",
+      index: 20,
       parameters: {},
     });
   });
@@ -189,6 +207,7 @@ describe("parse(string)", function () {
   it("should ignore unterminated quoted parameter with backslash", function () {
     assert.deepEqual(parse('text/plain; foo="bar\\'), {
       type: "text/plain",
+      index: 21,
       parameters: {},
     });
   });
@@ -196,6 +215,7 @@ describe("parse(string)", function () {
   it("should parse and ignore non-OWS after closing quote", function () {
     assert.deepEqual(parse('text/plain; foo="bar"baz'), {
       type: "text/plain",
+      index: 24,
       parameters: {
         foo: "bar",
       },
@@ -206,6 +226,7 @@ describe("parse(string)", function () {
     const type = parse('text/plain; foo="bar"baz; charset=utf-8');
     assert.deepEqual(type, {
       type: "text/plain",
+      index: 39,
       parameters: {
         foo: "bar",
         charset: "utf-8",
@@ -217,6 +238,7 @@ describe("parse(string)", function () {
     const type = parse('text/plain; foo=bar"baz');
     assert.deepEqual(type, {
       type: "text/plain",
+      index: 23,
       parameters: {
         foo: 'bar"baz',
       },
@@ -227,6 +249,7 @@ describe("parse(string)", function () {
     const type = parse("text/plain; foo=bar=baz");
     assert.deepEqual(type, {
       type: "text/plain",
+      index: 23,
       parameters: {
         foo: "bar=baz",
       },
@@ -237,6 +260,7 @@ describe("parse(string)", function () {
     const type = parse("text/html; charset=utf-8; charset=iso-8859-1");
     assert.deepEqual(type, {
       type: "text/html",
+      index: 44,
       parameters: {
         charset: "utf-8",
       },
@@ -247,6 +271,7 @@ describe("parse(string)", function () {
     const type = parse("text/html; Charset=utf-8; charset=iso-8859-1");
     assert.deepEqual(type, {
       type: "text/html",
+      index: 44,
       parameters: {
         charset: "utf-8",
       },
@@ -257,6 +282,7 @@ describe("parse(string)", function () {
     const type = parse('text/html; Charset="utf-8"; charset="iso-8859-1"');
     assert.deepEqual(type, {
       type: "text/html",
+      index: 48,
       parameters: {
         charset: "utf-8",
       },
@@ -269,6 +295,100 @@ describe("parse(string)", function () {
     });
     assert.deepEqual(type, {
       type: "text/html",
+      index: 9,
+      parameters: {},
+    });
+  });
+
+  it("should start parsing at options.start", function () {
+    const type = parse("ignored, text/html; charset=utf-8", { start: 9 });
+    assert.deepEqual(type, {
+      type: "text/html",
+      index: 33,
+      parameters: {
+        charset: "utf-8",
+      },
+    });
+  });
+
+  it("should parse successive values in an Accept header", function () {
+    const header = "text/html, application/json;q=0.9, */*;q=0.8";
+
+    assert.deepEqual(parse(header, { comma: true }), {
+      type: "text/html",
+      index: 9,
+      parameters: {},
+    });
+    assert.deepEqual(parse(header, { comma: true, start: 10 }), {
+      type: "application/json",
+      index: 33,
+      parameters: {
+        q: "0.9",
+      },
+    });
+    assert.deepEqual(parse(header, { comma: true, start: 34 }), {
+      type: "*/*",
+      index: 44,
+      parameters: {
+        q: "0.8",
+      },
+    });
+  });
+
+  it("should exit early on a comma when options.comma is true", function () {
+    const type = parse("text/html, application/json", { comma: true });
+    assert.deepEqual(type, {
+      type: "text/html",
+      index: 9,
+      parameters: {},
+    });
+  });
+
+  it("should exit early after parameters when options.comma is true", function () {
+    const type = parse(
+      "text/html; charset=utf-8, application/json; charset=utf-16",
+      { comma: true },
+    );
+    assert.deepEqual(type, {
+      type: "text/html",
+      index: 24,
+      parameters: {
+        charset: "utf-8",
+      },
+    });
+  });
+
+  it("should exit early after an invalid parameter when options.comma is true", function () {
+    const type = parse("text/html; invalid, application/json", {
+      comma: true,
+    });
+    assert.deepEqual(type, {
+      type: "text/html",
+      index: 18,
+      parameters: {},
+    });
+  });
+
+  it("should not exit on a comma inside quotes", function () {
+    const type = parse(
+      'text/html; profile="compact,print"; charset=utf-8, application/json',
+      { comma: true },
+    );
+    assert.deepEqual(type, {
+      type: "text/html",
+      index: 49,
+      parameters: {
+        profile: "compact,print",
+        charset: "utf-8",
+      },
+    });
+  });
+
+  it("should preserve commas by default", function () {
+    const type = parse("text/html, application/json");
+    assert.deepEqual(type, {
+      type: "text/html, application/json",
+      index: 27,
       parameters: {},
     });
   });
