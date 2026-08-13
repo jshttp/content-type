@@ -36,6 +36,7 @@ const NullObject = /* @__PURE__ */ (() => {
  */
 export interface ContentType {
   type: string;
+  index: number;
   parameters: Record<string, string>;
 }
 
@@ -68,26 +69,46 @@ export function format(obj: Partial<ContentType>): string {
  * Options for parsing a `Content-Type` header.
  */
 export interface ParseOptions {
+  /**
+   * Exit early on the first semicolon, returning only the type.
+   * This is useful for parsing the MIME from `Content-Type` headers.
+   *
+   * @default false
+   */
   parameters?: boolean;
+  /**
+   * Exits early on a comma, returning the first value and parameters.
+   * This is useful for parsing `Accept` headers.
+   *
+   * @default false
+   */
+  comma?: boolean;
+  /**
+   * The index to start parsing from.
+   *
+   * @default 0
+   */
+  start?: number;
 }
 
 /**
  * Parse a `Content-Type` header.
  */
 export function parse(header: string, options?: ParseOptions): ContentType {
+  const stopChar = options?.comma === true ? COMMA : 65_536; // Sentinel for "no stop char".
   const len = header.length;
-  let index = skipOWS(header, 0, len);
+  let index = skipOWS(header, options?.start ?? 0, len);
 
   const valueStart = index;
-  index = skipValue(header, index, len);
+  index = skipValue(header, index, len, stopChar);
   const valueEnd = trailingOWS(header, valueStart, index);
   const type = header.slice(valueStart, valueEnd).toLowerCase();
-  const parameters =
-    options?.parameters === false
-      ? new NullObject()
-      : parseParameters(header, index, len);
 
-  return { type, parameters };
+  if (options?.parameters === false) {
+    return { type, index, parameters: new NullObject() };
+  }
+
+  return parseParameters(header, type, index, len, stopChar);
 }
 
 const SP = 32; // " "
@@ -96,24 +117,31 @@ const SEMI = 59; // ";"
 const EQ = 61; // "="
 const DQUOTE = 34; // '"'
 const BSLASH = 92; // "\\"
+const COMMA = 44; // ","
 
 /**
  * Parses the parameters of a `Content-Type` header starting at the given index.
  */
 function parseParameters(
   header: string,
+  type: string,
   index: number,
   len: number,
-): Record<string, string> {
+  stopChar: number,
+): ContentType {
   const parameters: Record<string, string> = new NullObject();
 
   parameter: while (index < len) {
+    if (header.charCodeAt(index) === stopChar) break;
+
     index = skipOWS(header, index + 1 /* Skip over ; */, len);
 
     const keyStart = index;
 
     while (index < len) {
       const code = header.charCodeAt(index);
+      if (code === stopChar) break parameter;
+
       if (code === SEMI) continue parameter;
 
       if (code === EQ) {
@@ -129,7 +157,7 @@ function parseParameters(
           while (index < len) {
             const code = header.charCodeAt(index++);
             if (code === DQUOTE) {
-              index = skipValue(header, index, len);
+              index = skipValue(header, index, len, stopChar);
               if (parameters[key] === undefined) parameters[key] = value;
               break;
             }
@@ -146,7 +174,7 @@ function parseParameters(
         }
 
         const valueStart = index;
-        index = skipValue(header, index, len);
+        index = skipValue(header, index, len, stopChar);
 
         if (parameters[key] === undefined) {
           const valueEnd = trailingOWS(header, valueStart, index);
@@ -160,16 +188,21 @@ function parseParameters(
     }
   }
 
-  return parameters;
+  return { type, index, parameters };
 }
 
 /**
- * Skip over characters until a semicolon.
+ * Skip over characters until a semicolon or other exit character.
  */
-function skipValue(str: string, index: number, len: number): number {
+function skipValue(
+  str: string,
+  index: number,
+  len: number,
+  stopChar: number,
+): number {
   while (index < len) {
-    const char = str.charCodeAt(index);
-    if (char === SEMI) break;
+    const code = str.charCodeAt(index);
+    if (code === SEMI || code === stopChar) break;
     index++;
   }
   return index;
