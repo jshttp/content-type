@@ -1,5 +1,5 @@
 import { bench, describe } from "vitest";
-import { format, parse } from "./index";
+import { format, parse } from "./index.js";
 
 describe("parse", () => {
   const BASIC_HEADER = "text/html";

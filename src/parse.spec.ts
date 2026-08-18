@@ -1,5 +1,5 @@
 import { describe, it, assert } from "vitest";
-import { parse } from "./index";
+import { parse } from "./index.js";
 
 const invalidTypes = [
   " ",

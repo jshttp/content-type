@@ -1,5 +1,5 @@
 import { describe, it, assert } from "vitest";
-import { format } from "./index";
+import { format } from "./index.js";
 
 describe("format(obj)", function () {
   it("should format basic type", function () {
