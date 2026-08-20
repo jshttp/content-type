@@ -17,7 +17,7 @@ npm install content-type
 ## API
 
 ```js
-const contentType = require("content-type");
+import * as contentType from "content-type";
 ```
 
 ### contentType.parse(string, options?)
