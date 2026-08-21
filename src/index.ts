@@ -4,24 +4,6 @@
  * MIT Licensed
  */
 
-const TEXT_REGEXP = /^[\u0009\u0020-\u007e\u0080-\u00ff]*$/;
-const TOKEN_REGEXP = /^[!#$%&'*+.^_`|~0-9A-Za-z-]+$/;
-
-/**
- * RegExp to match chars that must be quoted-pair in RFC 9110 sec 5.6.4
- */
-const QUOTE_REGEXP = /[\\"]/g;
-
-/**
- * RegExp to match type in RFC 9110 sec 8.3.1
- *
- * media-type = type "/" subtype
- * type       = token
- * subtype    = token
- */
-const TYPE_REGEXP =
-  /^[!#$%&'*+.^_`|~0-9A-Za-z-]+\/[!#$%&'*+.^_`|~0-9A-Za-z-]+$/;
-
 /**
  * Null object perf optimization. Faster than `Object.create(null)` and `{ __proto__: null }`.
  */
@@ -30,6 +12,26 @@ const NullObject = /* @__PURE__ */ (() => {
   C.prototype = Object.create(null);
   return C;
 })() as unknown as { new (): any };
+
+/**
+ * ASCII character lookup table for the token production in RFC 9110.
+ */
+const TOKEN_CODES = /* @__PURE__ */ (() => {
+  const codes = new Uint8Array(128);
+  codes[33] = 1; // !
+  codes.fill(1, 35, 40); // # $ % & '
+  codes[42] = 1; // *
+  codes[43] = 1; // +
+  codes[45] = 1; // -
+  codes[46] = 1; // .
+  codes.fill(1, 48, 58); // 0-9
+  codes.fill(1, 65, 91); // A-Z
+  codes.fill(1, 94, 97); // ^ _ `
+  codes.fill(1, 97, 123); // a-z
+  codes[124] = 1; // |
+  codes[126] = 1; // ~
+  return codes;
+})();
 
 /**
  * The content type object contains a type string and optional parameters.
@@ -41,12 +43,79 @@ export interface ContentType {
 }
 
 /**
+ * Validate a type string against RFC 9110.
+ */
+export function isTypeValid(type: string): boolean {
+  const len = type.length;
+  let hasSlash = false;
+
+  for (let index = 0; index < len; index++) {
+    const code = type.charCodeAt(index);
+
+    if (code === 47 /* / */) {
+      if (hasSlash || index === 0 || index === len - 1) return false;
+      hasSlash = true;
+    } else if (!isTokenCode(code)) {
+      return false;
+    }
+  }
+
+  return hasSlash;
+}
+
+/**
+ * Validate a token against RFC 9110.
+ */
+export function isTokenValid(name: string): boolean {
+  const len = name.length;
+  if (len === 0) return false;
+
+  for (let index = 0; index < len; index++) {
+    if (!isTokenCode(name.charCodeAt(index))) return false;
+  }
+
+  return true;
+}
+
+/**
+ * Check whether a character code belongs to the token production in RFC 9110.
+ */
+function isTokenCode(code: number): boolean {
+  return code < 128 && TOKEN_CODES[code] !== 0;
+}
+
+/**
+ * Serialize a parameter value.
+ */
+export function parameterValue(str: string): string {
+  if (isTokenValid(str)) return str;
+
+  let result = '"';
+  let start = 0;
+
+  for (let index = 0; index < str.length; index++) {
+    const code = str.charCodeAt(index);
+
+    if (code !== 9 && (code < 32 || code === 127 || code > 255)) {
+      throw new TypeError(`Invalid parameter value: ${str}`);
+    }
+
+    if (code === 34 /* " */ || code === 92 /* \\ */) {
+      result += `${str.slice(start, index)}\\`;
+      start = index;
+    }
+  }
+
+  return `${result}${str.slice(start)}"`;
+}
+
+/**
  * Format an object into a `Content-Type` header.
  */
 export function format(obj: Partial<ContentType>): string {
   const { type, parameters } = obj;
 
-  if (!type || !TYPE_REGEXP.test(type)) {
+  if (!type || !isTypeValid(type)) {
     throw new TypeError(`Invalid type: ${type}`);
   }
 
@@ -54,11 +123,11 @@ export function format(obj: Partial<ContentType>): string {
 
   if (parameters) {
     for (const param of Object.keys(parameters)) {
-      if (!TOKEN_REGEXP.test(param)) {
+      if (!isTokenValid(param)) {
         throw new TypeError(`Invalid parameter name: ${param}`);
       }
 
-      result += `; ${param}=${qstring(parameters[param])}`;
+      result += `; ${param}=${parameterValue(parameters[param])}`;
     }
   }
 
@@ -234,14 +303,4 @@ function trailingOWS(header: string, start: number, end: number): number {
     end--;
   }
   return end;
-}
-
-/**
- * Serialize a parameter value.
- */
-function qstring(str: string): string {
-  if (TOKEN_REGEXP.test(str)) return str;
-  if (TEXT_REGEXP.test(str)) return `"${str.replace(QUOTE_REGEXP, "\\$&")}"`;
-
-  throw new TypeError(`Invalid parameter value: ${str}`);
 }
