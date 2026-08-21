@@ -1,5 +1,51 @@
 import { bench, describe } from "vitest";
-import { format, parse } from "./index.js";
+import {
+  format,
+  isTokenValid,
+  isTypeValid,
+  parameterValue,
+  parse,
+} from "./index.js";
+
+describe("isTypeValid", () => {
+  bench("valid", () => {
+    isTypeValid("application/ld+json");
+  });
+
+  bench("invalid", () => {
+    isTypeValid("application/ld json");
+  });
+});
+
+describe("isTokenValid", () => {
+  bench("valid", () => {
+    isTokenValid("profile-version");
+  });
+
+  bench("invalid", () => {
+    isTokenValid("profile version");
+  });
+});
+
+describe("parameterValue", () => {
+  bench("token", () => {
+    parameterValue("utf-8");
+  });
+
+  bench("quoted", () => {
+    parameterValue("urn:example:v1");
+  });
+
+  bench("quoted and escaped", () => {
+    parameterValue(String.raw`quarterly\report"-2026.csv`);
+  });
+
+  bench("invalid", () => {
+    try {
+      parameterValue("invalid\u0000value");
+    } catch {}
+  });
+});
 
 describe("parse", () => {
   const BASIC_HEADER = "text/html";
