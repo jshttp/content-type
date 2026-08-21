@@ -4,24 +4,6 @@
  * MIT Licensed
  */
 
-const TEXT_REGEXP = /^[\u0009\u0020-\u007e\u0080-\u00ff]*$/;
-const TOKEN_REGEXP = /^[!#$%&'*+.^_`|~0-9A-Za-z-]+$/;
-
-/**
- * RegExp to match chars that must be quoted-pair in RFC 9110 sec 5.6.4
- */
-const QUOTE_REGEXP = /[\\"]/g;
-
-/**
- * RegExp to match type in RFC 9110 sec 8.3.1
- *
- * media-type = type "/" subtype
- * type       = token
- * subtype    = token
- */
-const TYPE_REGEXP =
-  /^[!#$%&'*+.^_`|~0-9A-Za-z-]+\/[!#$%&'*+.^_`|~0-9A-Za-z-]+$/;
-
 const SP = 32; // " "
 const HTAB = 9; // "\t"
 const SEMI = 59; // ";"
@@ -34,6 +16,7 @@ const LOWER_CASE = 1;
 const OWS = 2;
 const SEMI_FLAG = 4;
 const COMMA_FLAG = 8;
+const TOKEN_FLAG = 16;
 const NON_ASCII = 0xff00;
 const CASE_FLAGS = LOWER_CASE | NON_ASCII;
 
@@ -43,16 +26,25 @@ const CASE_FLAGS = LOWER_CASE | NON_ASCII;
  */
 const CHAR_MAP = new Uint8Array(0x100);
 
-for (let code = 0x41 /* A */; code <= 0x5a /* Z */; code++) {
-  CHAR_MAP[code] |= LOWER_CASE;
-}
-
 CHAR_MAP[HTAB] |= OWS;
 CHAR_MAP[SP] |= OWS;
 CHAR_MAP[SEMI] |= SEMI_FLAG;
 CHAR_MAP[COMMA] |= COMMA_FLAG;
 for (let code = 0x80 /* non-ASCII */; code <= 0xff; code++) {
   CHAR_MAP[code] |= LOWER_CASE;
+}
+
+for (const char of "!#$%&'*+-.^_`|~") {
+  CHAR_MAP[char.charCodeAt(0)] |= TOKEN_FLAG;
+}
+for (let code = 0x30 /* 0 */; code <= 0x39 /* 9 */; code++) {
+  CHAR_MAP[code] |= TOKEN_FLAG;
+}
+for (let code = 0x41 /* A */; code <= 0x5a /* Z */; code++) {
+  CHAR_MAP[code] |= LOWER_CASE | TOKEN_FLAG;
+}
+for (let code = 0x61 /* a */; code <= 0x7a /* z */; code++) {
+  CHAR_MAP[code] |= TOKEN_FLAG;
 }
 
 /**
@@ -74,12 +66,86 @@ export interface ContentType {
 }
 
 /**
+ * Validate a type string against RFC 9110.
+ */
+export function isTypeValid(type: string): boolean {
+  const len = type.length;
+  let hasSlash = false;
+
+  for (let index = 0; index < len; index++) {
+    const code = type.charCodeAt(index);
+
+    if (code === 47 /* / */) {
+      if (hasSlash || index === 0 || index === len - 1) return false;
+      hasSlash = true;
+    } else if (!isTokenCode(code)) {
+      return false;
+    }
+  }
+
+  return hasSlash;
+}
+
+/**
+ * Validate a token against RFC 9110.
+ */
+export function isTokenValid(name: string): boolean {
+  const len = name.length;
+  if (len === 0) return false;
+
+  for (let index = 0; index < len; index++) {
+    if (!isTokenCode(name.charCodeAt(index))) return false;
+  }
+
+  return true;
+}
+
+/**
+ * Check whether a character code belongs to the token production in RFC 9110.
+ */
+function isTokenCode(code: number): boolean {
+  return (CHAR_MAP[code] & TOKEN_FLAG) !== 0;
+}
+
+/**
+ * Serialize a parameter value.
+ */
+function parameterValue(str: string): string {
+  const len = str.length;
+  if (len === 0) return '""';
+
+  let index = 0;
+  while (index < len && isTokenCode(str.charCodeAt(index))) index++;
+  if (index === len) return str;
+
+  let result = '"';
+  let start = 0;
+
+  while (index < len) {
+    const code = str.charCodeAt(index);
+
+    if (code !== HTAB && (code < SP || code === 127 || code > 255)) {
+      throw new TypeError(`Invalid parameter value: ${str}`);
+    }
+
+    if (code === 34 /* " */ || code === 92 /* \\ */) {
+      result += `${str.slice(start, index)}\\`;
+      start = index;
+    }
+
+    index++;
+  }
+
+  return `${result}${str.slice(start)}"`;
+}
+
+/**
  * Format an object into a `Content-Type` header.
  */
 export function format(obj: Partial<ContentType>): string {
   const { type, parameters } = obj;
 
-  if (!type || !TYPE_REGEXP.test(type)) {
+  if (!type || !isTypeValid(type)) {
     throw new TypeError(`Invalid type: ${type}`);
   }
 
@@ -87,11 +153,11 @@ export function format(obj: Partial<ContentType>): string {
 
   if (parameters) {
     for (const param of Object.keys(parameters)) {
-      if (!TOKEN_REGEXP.test(param)) {
+      if (!isTokenValid(param)) {
         throw new TypeError(`Invalid parameter name: ${param}`);
       }
 
-      result += `; ${param}=${qstring(parameters[param])}`;
+      result += `; ${param}=${parameterValue(parameters[param])}`;
     }
   }
 
@@ -193,7 +259,7 @@ function parseParameters(
       const code = header.charCodeAt(index);
       const flags = CHAR_MAP[code];
       if ((flags & stopFlags) !== 0) {
-        if (flags === COMMA_FLAG) break parameter;
+        if ((flags & COMMA_FLAG) !== 0) break parameter;
         continue parameter;
       }
 
@@ -307,14 +373,4 @@ function unescapeQuotedPairs(str: string, start: number, end: number): string {
   }
 
   return result + str.slice(start, end);
-}
-
-/**
- * Serialize a parameter value.
- */
-function qstring(str: string): string {
-  if (TOKEN_REGEXP.test(str)) return str;
-  if (TEXT_REGEXP.test(str)) return `"${str.replace(QUOTE_REGEXP, "\\$&")}"`;
-
-  throw new TypeError(`Invalid parameter value: ${str}`);
 }
