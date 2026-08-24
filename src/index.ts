@@ -22,6 +22,39 @@ const QUOTE_REGEXP = /[\\"]/g;
 const TYPE_REGEXP =
   /^[!#$%&'*+.^_`|~0-9A-Za-z-]+\/[!#$%&'*+.^_`|~0-9A-Za-z-]+$/;
 
+const SP = 32; // " "
+const HTAB = 9; // "\t"
+const SEMI = 59; // ";"
+const EQ = 61; // "="
+const DQUOTE = 34; // '"'
+const BSLASH = 92; // "\\"
+const COMMA = 44; // ","
+
+const LOWER_CASE = 1;
+const OWS = 2;
+const SEMI_FLAG = 4;
+const COMMA_FLAG = 8;
+const NON_ASCII = 0xff00;
+const CASE_FLAGS = LOWER_CASE | NON_ASCII;
+
+/**
+ * Character flags used to normalize HTTP field values while scanning.
+ * Out-of-range reads intentionally coerce to zero in bitwise expressions.
+ */
+const CHAR_MAP = new Uint8Array(0x100);
+
+for (let code = 0x41 /* A */; code <= 0x5a /* Z */; code++) {
+  CHAR_MAP[code] |= LOWER_CASE;
+}
+
+CHAR_MAP[HTAB] |= OWS;
+CHAR_MAP[SP] |= OWS;
+CHAR_MAP[SEMI] |= SEMI_FLAG;
+CHAR_MAP[COMMA] |= COMMA_FLAG;
+for (let code = 0x80 /* non-ASCII */; code <= 0xff; code++) {
+  CHAR_MAP[code] |= LOWER_CASE;
+}
+
 /**
  * Null object perf optimization. Faster than `Object.create(null)` and `{ __proto__: null }`.
  */
@@ -95,29 +128,44 @@ export interface ParseOptions {
  * Parse a `Content-Type` header.
  */
 export function parse(header: string, options?: ParseOptions): ContentType {
-  const stopChar = options?.comma === true ? COMMA : 65_536; // Sentinel for "no stop char".
+  const stopFlags = SEMI_FLAG | (options?.comma === true ? COMMA_FLAG : 0);
   const len = header.length;
-  let index = skipOWS(header, options?.start ?? 0, len);
+  let valueStart = options?.start ?? 0;
+  while ((CHAR_MAP[header.charCodeAt(valueStart)] & OWS) !== 0) {
+    valueStart++;
+  }
 
-  const valueStart = index;
-  index = skipValue(header, index, len, stopChar);
-  const valueEnd = trailingOWS(header, valueStart, index);
-  const type = header.slice(valueStart, valueEnd).toLowerCase();
+  let index = valueStart;
+  let typeFlags = 0;
+  let whitespace = -1;
+  let stop = options?.parameters === false ? COMMA_FLAG : 0;
+  while (index < len) {
+    const code = header.charCodeAt(index);
+    const flags = CHAR_MAP[code];
+    if ((flags & stopFlags) !== 0) {
+      stop |= flags & COMMA_FLAG;
+      break;
+    }
 
-  if (options?.parameters === false) {
+    if ((flags & OWS) !== 0) {
+      if (whitespace === -1) whitespace = index;
+    } else {
+      whitespace = -1;
+    }
+
+    typeFlags |= (code & NON_ASCII) | flags;
+    index++;
+  }
+  const valueEnd = whitespace === -1 ? index : whitespace;
+  const value = header.slice(valueStart, valueEnd);
+  const type = (typeFlags & CASE_FLAGS) === 0 ? value : value.toLowerCase();
+
+  if (index === len || stop !== 0) {
     return { type, index, parameters: new NullObject() };
   }
 
-  return parseParameters(header, type, index, len, stopChar);
+  return parseParameters(header, type, index, len, stopFlags);
 }
-
-const SP = 32; // " "
-const HTAB = 9; // "\t"
-const SEMI = 59; // ";"
-const EQ = 61; // "="
-const DQUOTE = 34; // '"'
-const BSLASH = 92; // "\\"
-const COMMA = 44; // ","
 
 /**
  * Parses the parameters of a `Content-Type` header starting at the given index.
@@ -127,63 +175,117 @@ function parseParameters(
   type: string,
   index: number,
   len: number,
-  stopChar: number,
+  stopFlags: number,
 ): ContentType {
   const parameters: Record<string, string> = new NullObject();
 
   parameter: while (index < len) {
-    if (header.charCodeAt(index) === stopChar) break;
-
-    index = skipOWS(header, index + 1 /* Skip over ; */, len);
+    index++; // Skip over ;
+    while ((CHAR_MAP[header.charCodeAt(index)] & OWS) !== 0) {
+      index++;
+    }
 
     const keyStart = index;
+    let keyFlags = 0;
+    let keyWhitespace = -1;
 
     while (index < len) {
       const code = header.charCodeAt(index);
-      if (code === stopChar) break parameter;
-
-      if (code === SEMI) continue parameter;
+      const flags = CHAR_MAP[code];
+      if ((flags & stopFlags) !== 0) {
+        if (flags === COMMA_FLAG) break parameter;
+        continue parameter;
+      }
 
       if (code === EQ) {
-        const keyEnd = trailingOWS(header, keyStart, index);
-        const key = header.slice(keyStart, keyEnd).toLowerCase();
+        const keyEnd = keyWhitespace === -1 ? index : keyWhitespace;
+        const value = header.slice(keyStart, keyEnd);
+        const key = (keyFlags & CASE_FLAGS) === 0 ? value : value.toLowerCase();
 
-        index = skipOWS(header, index + 1, len);
+        index++;
+        while ((CHAR_MAP[header.charCodeAt(index)] & OWS) !== 0) {
+          index++;
+        }
 
         if (index < len && header.charCodeAt(index) === DQUOTE) {
-          index++;
+          const quotedStart = ++index;
+          let escaped = false;
 
-          let value = "";
           while (index < len) {
-            const code = header.charCodeAt(index++);
+            const code = header.charCodeAt(index);
             if (code === DQUOTE) {
-              index = skipValue(header, index, len, stopChar);
-              if (parameters[key] === undefined) parameters[key] = value;
-              break;
+              if (parameters[key] === undefined) {
+                parameters[key] = escaped
+                  ? unescapeQuotedPairs(header, quotedStart, index)
+                  : header.slice(quotedStart, index);
+              }
+
+              index++;
+              let stop = 0;
+
+              // Discard characters between quote and delimiter.
+              while (index < len) {
+                const code = header.charCodeAt(index);
+                const flags = CHAR_MAP[code];
+                if ((flags & stopFlags) !== 0) {
+                  stop = flags & COMMA_FLAG;
+                  break;
+                }
+                index++;
+              }
+
+              if (stop !== 0) break parameter;
+              continue parameter;
             }
 
-            if (code === BSLASH && index < len) {
-              value += header[index++];
+            if (code === BSLASH && index + 1 < len) {
+              escaped = true;
+              index += 2;
               continue;
             }
 
-            value += String.fromCharCode(code);
+            index++;
           }
 
           continue parameter;
         }
 
         const valueStart = index;
-        index = skipValue(header, index, len, stopChar);
+        let stop = 0;
+        let valueWhitespace = -1;
+        while (index < len) {
+          const code = header.charCodeAt(index);
+          const flags = CHAR_MAP[code];
+          if ((flags & stopFlags) !== 0) {
+            stop = flags & COMMA_FLAG;
+            break;
+          }
+
+          if ((flags & OWS) !== 0) {
+            if (valueWhitespace === -1) valueWhitespace = index;
+          } else {
+            valueWhitespace = -1;
+          }
+
+          index++;
+        }
 
         if (parameters[key] === undefined) {
-          const valueEnd = trailingOWS(header, valueStart, index);
+          const valueEnd = valueWhitespace === -1 ? index : valueWhitespace;
           parameters[key] = header.slice(valueStart, valueEnd);
         }
 
+        if (stop !== 0) break parameter;
         continue parameter;
       }
 
+      if ((flags & OWS) !== 0) {
+        if (keyWhitespace === -1) keyWhitespace = index;
+      } else {
+        keyWhitespace = -1;
+      }
+
+      keyFlags |= (code & NON_ASCII) | flags;
       index++;
     }
   }
@@ -192,48 +294,19 @@ function parseParameters(
 }
 
 /**
- * Skip over characters until a semicolon or other exit character.
+ * Remove backslashes from quoted pairs in a known-terminated quoted string body.
  */
-function skipValue(
-  str: string,
-  index: number,
-  len: number,
-  stopChar: number,
-): number {
-  while (index < len) {
-    const code = str.charCodeAt(index);
-    if (code === SEMI || code === stopChar) break;
-    index++;
-  }
-  return index;
-}
+function unescapeQuotedPairs(str: string, start: number, end: number): string {
+  let result = "";
 
-/**
- * Skip optional whitespace (OWS) in an HTTP header value.
- *
- * OWS is defined in RFC 9110 sec 5.6.3 as SP (" ") or HTAB ("\t").
- */
-function skipOWS(header: string, index: number, len: number): number {
-  while (index < len) {
-    const char = header.charCodeAt(index);
-    if (char !== SP && char !== HTAB) break;
-    index++;
+  for (let index = start; index < end; index++) {
+    if (str.charCodeAt(index) === BSLASH) {
+      result += str.slice(start, index);
+      start = ++index;
+    }
   }
-  return index;
-}
 
-/**
- * Trim optional whitespace (OWS) from the end of a substring.
- *
- * OWS is defined in RFC 9110 sec 5.6.3 as SP (" ") or HTAB ("\t").
- */
-function trailingOWS(header: string, start: number, end: number): number {
-  while (end > start) {
-    const char = header.charCodeAt(end - 1);
-    if (char !== SP && char !== HTAB) break;
-    end--;
-  }
-  return end;
+  return result + str.slice(start, end);
 }
 
 /**

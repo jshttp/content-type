@@ -7,7 +7,6 @@ const invalidTypes = [
   "undefined",
   "/",
   "text / plain",
-  "text/$plain",
   'text/"plain"',
   "text/p£ain",
   "text/(plain)",
@@ -47,6 +46,14 @@ describe("parse(string)", function () {
     assert.deepEqual(type, {
       type: "image/svg+xml",
       index: 13,
+      parameters: {},
+    });
+  });
+
+  it("should accept token punctuation", function () {
+    assert.deepEqual(parse("text/$plain"), {
+      type: "text/$plain",
+      index: 11,
       parameters: {},
     });
   });
@@ -128,11 +135,31 @@ describe("parse(string)", function () {
     });
   });
 
+  it("should trim trailing whitespace after invalid parameter name whitespace", function () {
+    const type = parse("text/plain; foo bar =baz");
+    assert.deepEqual(type, {
+      type: "text/plain",
+      index: 24,
+      parameters: {
+        "foo bar": "baz",
+      },
+    });
+  });
+
   it("should lower-case type", function () {
     const type = parse("IMAGE/SVG+XML");
     assert.deepEqual(type, {
       type: "image/svg+xml",
       index: 13,
+      parameters: {},
+    });
+  });
+
+  it("should lower-case non-ASCII type", function () {
+    const type = parse("TEXT/PLÄIN");
+    assert.deepEqual(type, {
+      type: "text/pläin",
+      index: 10,
       parameters: {},
     });
   });
@@ -144,6 +171,17 @@ describe("parse(string)", function () {
       index: 24,
       parameters: {
         charset: "UTF-8",
+      },
+    });
+  });
+
+  it("should lower-case non-ASCII parameter names", function () {
+    const type = parse("text/plain; FÖÖ=bar");
+    assert.deepEqual(type, {
+      type: "text/plain",
+      index: 19,
+      parameters: {
+        föö: "bar",
       },
     });
   });
@@ -252,6 +290,17 @@ describe("parse(string)", function () {
       index: 23,
       parameters: {
         foo: "bar=baz",
+      },
+    });
+  });
+
+  it("should trim trailing whitespace after invalid internal whitespace", function () {
+    const type = parse("text/plain; foo=bar baz ");
+    assert.deepEqual(type, {
+      type: "text/plain",
+      index: 24,
+      parameters: {
+        foo: "bar baz",
       },
     });
   });
