@@ -39,7 +39,7 @@
     "vitest": "^4.1.11"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=20"
   },
   "ts-scripts": {
     "dist": [
