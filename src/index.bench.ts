@@ -3,7 +3,12 @@ import { format, parse } from "./index.js";
 
 describe("parse", () => {
   const BASIC_HEADER = "text/html";
+  const SINGLE_PARAM_HEADER = "application/json; charset=utf-8";
+  const UPPERCASE_PARAM_HEADER = "APPLICATION/JSON; CHARSET=utf-8";
+  const ACCEPT_HEADER =
+    "text/html; charset=utf-8, application/json;q=0.9, */*;q=0.8";
   const PARAMS_HEADER = "application/json; charset=utf-8; foo=bar; version=1";
+  const QUOTED_SIMPLE_HEADER = 'application/json; charset="utf-8"';
   const QUOTED_HEADER =
     'text/plain; filename="report\\"-2026.csv"; foo=bar; version=1';
   const OWS_HEADER =
@@ -19,6 +24,26 @@ describe("parse", () => {
 
   bench("simple parameters", () => {
     parse(PARAMS_HEADER);
+  });
+
+  bench("single parameter", () => {
+    parse(SINGLE_PARAM_HEADER);
+  });
+
+  bench("uppercase single parameter", () => {
+    parse(UPPERCASE_PARAM_HEADER);
+  });
+
+  bench("accept header (comma = true)", () => {
+    parse(ACCEPT_HEADER, { comma: true });
+  });
+
+  bench("accept header (comma = false)", () => {
+    parse(ACCEPT_HEADER);
+  });
+
+  bench("simple quoted parameter", () => {
+    parse(QUOTED_SIMPLE_HEADER);
   });
 
   bench("simple parameters (options.parameters = false)", () => {
