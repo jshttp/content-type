@@ -49,6 +49,14 @@ describe("format(obj)", function () {
     assert.strictEqual(str, 'text/html; foo="bar or \\"baz\\""');
   });
 
+  it("should escape backslashes and quotes in parameter values", function () {
+    const str = format({
+      type: "text/html",
+      parameters: { foo: String.raw`bar\"baz` },
+    });
+    assert.strictEqual(str, String.raw`text/html; foo="bar\\\"baz"`);
+  });
+
   it("should format type with parameter with empty value", function () {
     const str = format({
       type: "text/html",

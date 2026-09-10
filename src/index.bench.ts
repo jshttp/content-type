@@ -1,5 +1,25 @@
 import { bench, describe } from "vitest";
-import { format, parse } from "./index.js";
+import { format, isTokenValid, isTypeValid, parse } from "./index.js";
+
+describe("isTypeValid", () => {
+  bench("valid", () => {
+    isTypeValid("application/ld+json");
+  });
+
+  bench("invalid", () => {
+    isTypeValid("application/ld json");
+  });
+});
+
+describe("isTokenValid", () => {
+  bench("valid", () => {
+    isTokenValid("profile-version");
+  });
+
+  bench("invalid", () => {
+    isTokenValid("profile version");
+  });
+});
 
 describe("parse", () => {
   const BASIC_HEADER = "text/html";
