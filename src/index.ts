@@ -68,15 +68,18 @@ export interface ContentType {
 /**
  * Validate a type string against RFC 9110.
  */
-export function isTypeValid(type: string): boolean {
-  const len = type.length;
+export function isTypeValid(
+  type: string,
+  start = 0,
+  end = type.length,
+): boolean {
   let hasSlash = false;
 
-  for (let index = 0; index < len; index++) {
+  for (let index = start; index < end; index++) {
     const code = type.charCodeAt(index);
 
     if (code === 47 /* / */) {
-      if (hasSlash || index === 0 || index === len - 1) return false;
+      if (hasSlash || index === start || index >= end - 1) return false;
       hasSlash = true;
     } else if (!isTokenCode(code)) {
       return false;
@@ -89,12 +92,15 @@ export function isTypeValid(type: string): boolean {
 /**
  * Validate a token against RFC 9110.
  */
-export function isTokenValid(name: string): boolean {
-  const len = name.length;
-  if (len === 0) return false;
+export function isTokenValid(
+  token: string,
+  start = 0,
+  end = token.length,
+): boolean {
+  if (start >= end) return false;
 
-  for (let index = 0; index < len; index++) {
-    if (!isTokenCode(name.charCodeAt(index))) return false;
+  for (let index = start; index < end; index++) {
+    if (!isTokenCode(token.charCodeAt(index))) return false;
   }
 
   return true;
