@@ -30,7 +30,7 @@ Parse a `Content-Type` header. This will return an object with the following pro
 
 - `type`: The media type (always lower case). Example: `'image/svg+xml'`.
 - `parameters`: An object of the parameters in the media type (parameter name is always lower case). Example: `{charset: 'utf-8'}`.
-- `index`: The index where parsing stopped. Example: `33`.
+- `index`: The index of the delimiter where parsing stopped, or the string length if the entire header was consumed. Example: `28`.
 
 The parser is lenient and does not validate or throw on malformed input.
 
