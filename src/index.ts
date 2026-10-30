@@ -175,10 +175,10 @@ export function format(obj: Partial<ContentType>): string {
  */
 export interface ParseOptions {
   /**
-   * Exit early on the first semicolon, returning only the type.
-   * This is useful for parsing the MIME from `Content-Type` headers.
+   * Whether to parse parameters after the media type. Set to `false` to exit
+   * early on the first semicolon, returning only the type.
    *
-   * @default false
+   * @default true
    */
   parameters?: boolean;
   /**
